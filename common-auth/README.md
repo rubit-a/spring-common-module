@@ -61,6 +61,7 @@ auth:
 ```
 
 Session 모드는 기본적으로 `SessionCreationPolicy.IF_REQUIRED`를 사용합니다.
+기본 체인은 `anyRequest().authenticated()`로 동작하며 CSRF는 기본값(활성화)입니다.
 필요한 인증/인가 정책은 애플리케이션에서 `SecurityFilterChain`을 정의해 주세요.
 `auth.mode=session`일 때는 JWT 자동 설정이 비활성화됩니다.
 
@@ -134,7 +135,8 @@ fun getUserInfo(@RequestParam token: String): UserInfo {
 
 ### 4. 보호된 엔드포인트 설정
 
-기본 설정은 모든 요청을 허용합니다. 보호가 필요한 엔드포인트가 있다면 직접 `SecurityFilterChain`을 정의하세요:
+기본 설정은 모든 요청을 허용합니다. 보호가 필요한 엔드포인트가 있다면 직접 `SecurityFilterChain`을 정의하세요.
+애플리케이션에서 `SecurityFilterChain`을 정의하면 common-auth의 기본 체인은 등록되지 않습니다.
 
 ```kotlin
 @Configuration

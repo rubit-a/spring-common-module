@@ -35,7 +35,7 @@ class JwtAutoConfiguration(
     }
 
     @Bean
-    @ConditionalOnMissingBean(name = ["jwtSecurityFilterChain"])
+    @ConditionalOnMissingBean(SecurityFilterChain::class)
     fun jwtSecurityFilterChain(
         http: HttpSecurity,
         jwtAuthenticationFilter: JwtAuthenticationFilter

@@ -15,11 +15,11 @@ import org.springframework.security.web.SecurityFilterChain
 class SessionAutoConfiguration {
 
     @Bean
-    @ConditionalOnMissingBean(name = ["sessionSecurityFilterChain"])
+    @ConditionalOnMissingBean(SecurityFilterChain::class)
     fun sessionSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
         return http
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) }
-            .authorizeHttpRequests { auth -> auth.anyRequest().permitAll() }
+            .authorizeHttpRequests { auth -> auth.anyRequest().authenticated() }
             .build()
     }
 }

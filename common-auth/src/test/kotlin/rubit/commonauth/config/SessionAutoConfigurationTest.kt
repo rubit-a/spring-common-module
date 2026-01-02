@@ -6,6 +6,10 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.web.SecurityFilterChain
 
 @DisplayName("SessionAutoConfiguration 테스트")
 class SessionAutoConfigurationTest {
@@ -30,5 +34,27 @@ class SessionAutoConfigurationTest {
             .run { context ->
                 assertFalse(context.containsBean("sessionSecurityFilterChain"))
             }
+    }
+
+    @Test
+    @DisplayName("SecurityFilterChain 빈이 있으면 sessionSecurityFilterChain 빈이 등록되지 않는다")
+    fun sessionSecurityFilterChainIsNotRegisteredWhenCustomChainExists() {
+        contextRunner
+            .withUserConfiguration(CustomSecurityConfig::class.java)
+            .withPropertyValues("auth.mode=session")
+            .run { context ->
+                assertTrue(context.containsBean("customSecurityFilterChain"))
+                assertFalse(context.containsBean("sessionSecurityFilterChain"))
+            }
+    }
+
+    @Configuration
+    class CustomSecurityConfig {
+        @Bean
+        fun customSecurityFilterChain(http: HttpSecurity): SecurityFilterChain {
+            return http
+                .authorizeHttpRequests { auth -> auth.anyRequest().permitAll() }
+                .build()
+        }
     }
 }
