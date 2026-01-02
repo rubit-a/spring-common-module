@@ -1,0 +1,5 @@
+jwt:
+  secret-key: test-secret-key-for-jwt-must-be-at-least-256-bits-long-for-hmac-sha256
+  access-token-expiration: 3600000
+  refresh-token-expiration: 604800000
+  issuer: test-common-auth

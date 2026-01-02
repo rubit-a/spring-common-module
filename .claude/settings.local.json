@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./gradlew clean:*)",
+      "Bash(tree:*)",
+      "Bash(../common-auth/gradlew clean build)",
+      "Bash(./gradlew:*)",
+      "Bash(./common-auth/gradlew clean build:*)",
+      "Bash(chmod:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

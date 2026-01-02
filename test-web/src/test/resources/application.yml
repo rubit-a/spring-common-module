@@ -1,0 +1,12 @@
+spring:
+  application:
+    name: test-web-test
+
+server:
+  port: 0  # Random port for tests
+
+jwt:
+  secret-key: test-secret-key-for-jwt-must-be-at-least-256-bits-long-for-hmac-sha256
+  access-token-expiration: 3600000
+  refresh-token-expiration: 604800000
+  issuer: test-web-test
