@@ -6,13 +6,13 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 모듈 �
 
 ```
 spring-common-module/
-├── common-auth/          # 인증 공통 라이브러리 (JWT/Session)
-└── test-web/             # common-auth 사용 예제 프로젝트
+├── core-security/          # 인증 공통 라이브러리 (JWT/Session)
+└── test-web/             # core-security 사용 예제 프로젝트
 ```
 
 ## 모듈 소개
 
-### 1. common-auth
+### 1. core-security
 
 다른 Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 인증 라이브러리입니다.
 
@@ -23,11 +23,11 @@ spring-common-module/
 - Spring Boot Auto Configuration 지원
 - 인증 모드 선택 지원 (`jwt` 또는 `session`)
 
-**자세한 내용:** [common-auth/README.md](common-auth/README.md)
+**자세한 내용:** [core-security/README.md](core-security/README.md)
 
 ### 2. test-web
 
-`common-auth` 모듈을 활용하는 실제 웹 애플리케이션 예제입니다.
+`core-security` 모듈을 활용하는 실제 웹 애플리케이션 예제입니다.
 
 **주요 기능:**
 - JWT 기반 로그인 API
@@ -43,14 +43,14 @@ spring-common-module/
 
 ```bash
 cd spring-common-module
-./common-auth/gradlew build
+./core-security/gradlew build
 ```
 
 ### 2. test-web 애플리케이션 실행
 
 ```bash
 cd test-web
-../common-auth/gradlew bootRun
+../core-security/gradlew bootRun
 ```
 
 애플리케이션이 `http://localhost:8080`에서 실행됩니다.
@@ -79,37 +79,37 @@ curl http://localhost:8080/api/users/me \
 ```kotlin
 rootProject.name = "spring-common-module"
 
-include("common-auth")
+include("core-security")
 include("test-web")
 ```
 
 ### 모듈 간 의존성
 
-`test-web`은 `common-auth`를 의존성으로 사용합니다:
+`test-web`은 `core-security`를 의존성으로 사용합니다:
 
 ```kotlin
 // test-web/build.gradle.kts
 dependencies {
-    implementation(project(":common-auth"))
+    implementation(project(":core-security"))
     // ...
 }
 ```
 
-## 새 프로젝트에서 common-auth 사용하기
+## 새 프로젝트에서 core-security 사용하기
 
 ### 1. 의존성 추가
 
 같은 멀티 모듈 프로젝트 내에서:
 ```kotlin
 dependencies {
-    implementation(project(":common-auth"))
+    implementation(project(":core-security"))
 }
 ```
 
 Maven 저장소에 배포한 경우:
 ```kotlin
 dependencies {
-    implementation("rubit:common-auth:0.0.1-SNAPSHOT")
+    implementation("rubit:core-security:0.0.1-SNAPSHOT")
 }
 ```
 
@@ -186,17 +186,17 @@ class SecurityConfig {
 
 ```bash
 # 전체 프로젝트 빌드
-./common-auth/gradlew build
+./core-security/gradlew build
 
 # 특정 모듈만 빌드
-./common-auth/gradlew :common-auth:build
-./common-auth/gradlew :test-web:build
+./core-security/gradlew :core-security:build
+./core-security/gradlew :test-web:build
 
 # 테스트 실행
-./common-auth/gradlew test
+./core-security/gradlew test
 
 # 클린 빌드
-./common-auth/gradlew clean build
+./core-security/gradlew clean build
 ```
 
 ## 라이선스

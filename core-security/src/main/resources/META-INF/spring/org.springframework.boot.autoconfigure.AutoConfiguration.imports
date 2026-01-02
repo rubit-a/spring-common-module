@@ -1,0 +1,3 @@
+rubit.coresecurity.config.AuthAutoConfiguration
+rubit.coresecurity.config.JwtAutoConfiguration
+rubit.coresecurity.config.SessionAutoConfiguration

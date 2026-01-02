@@ -4,7 +4,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.web.bind.annotation.*
-import rubit.commonauth.jwt.JwtTokenProvider
+import rubit.coresecurity.jwt.JwtTokenProvider
 import rubit.testweb.commonauth.dto.LoginRequest
 import rubit.testweb.commonauth.dto.TokenResponse
 import rubit.testweb.commonauth.dto.UserInfoResponse

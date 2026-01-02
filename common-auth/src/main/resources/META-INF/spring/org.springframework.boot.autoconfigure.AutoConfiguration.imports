@@ -1,3 +1,0 @@
-rubit.commonauth.config.AuthAutoConfiguration
-rubit.commonauth.config.JwtAutoConfiguration
-rubit.commonauth.config.SessionAutoConfiguration

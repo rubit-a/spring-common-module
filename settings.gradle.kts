@@ -1,4 +1,4 @@
 rootProject.name = "spring-common-module"
 
-include("common-auth")
+include("core-security")
 include("test-web")

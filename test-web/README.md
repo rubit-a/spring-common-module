@@ -9,7 +9,7 @@ test-web/
 ├── src/main/kotlin/rubit/testweb/
 │   ├── TestWebApplication.kt          # Spring Boot 메인 애플리케이션
 │   │
-│   └── commonauth/                    # common-auth 모듈 관련 코드
+│   └── commonauth/                    # core-security 모듈 관련 코드
 │       ├── config/
 │       │   └── SecurityConfig.kt      # Spring Security 설정 (JWT/Session)
 │       ├── controller/
@@ -28,14 +28,14 @@ test-web/
 
 각 공통 모듈에 대한 테스트 코드는 해당 모듈 이름의 패키지 하위에 위치합니다:
 
-- `commonauth/` - `common-auth` 모듈 관련 코드
+- `commonauth/` - `core-security` 모듈 관련 코드
 - `(향후 추가될 모듈)/` - 예: `commonlog/`, `commondb/` 등
 
 이러한 구조를 통해 여러 공통 모듈을 동시에 테스트하면서도 각 모듈의 기능을 명확하게 구분할 수 있습니다.
 
 ## 현재 통합된 모듈
 
-### 1. common-auth (JWT/Session 인증)
+### 1. core-security (JWT/Session 인증)
 
 **주요 기능:**
 - JWT Access Token 및 Refresh Token 발급
@@ -51,7 +51,7 @@ test-web/
 
 ## API 엔드포인트
 
-### common-auth 모듈 테스트 API
+### core-security 모듈 테스트 API
 
 #### 1. 인증이 필요 없는 엔드포인트 (공개)
 
@@ -215,7 +215,7 @@ curl -X POST http://localhost:8080/api/session/logout \
   -b cookies.txt
 ```
 
-## common-auth 모듈 구현 예제
+## core-security 모듈 구현 예제
 
 ### SecurityConfig.kt
 
@@ -363,7 +363,7 @@ server:
 auth:
   mode: jwt
 
-# common-auth 모듈 설정
+# core-security 모듈 설정
 jwt:
   secret-key: my-super-secret-key-for-jwt-token-signing-must-be-at-least-256-bits-long
   access-token-expiration: 3600000  # 1시간
@@ -376,7 +376,7 @@ jwt:
 ```kotlin
 dependencies {
     // 공통 모듈
-    implementation(project(":common-auth"))
+    implementation(project(":core-security"))
 
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -393,7 +393,7 @@ dependencies {
 1. **의존성 추가** (`build.gradle.kts`):
 ```kotlin
 dependencies {
-    implementation(project(":common-auth"))
+    implementation(project(":core-security"))
     implementation(project(":새로운-모듈"))  // 추가
 }
 ```
@@ -418,5 +418,5 @@ src/main/kotlin/rubit/testweb/
 
 ## 참고
 
-- [common-auth 모듈 문서](../common-auth/README.md)
+- [core-security 모듈 문서](../core-security/README.md)
 - [프로젝트 루트 문서](../README.md)
