@@ -9,7 +9,7 @@ test-web/
 ├── src/main/kotlin/rubit/testweb/
 │   ├── TestWebApplication.kt          # Spring Boot 메인 애플리케이션
 │   │
-│   └── commonauth/                    # core-security 모듈 관련 코드
+│   └── coreauth/                    # core-security 모듈 관련 코드
 │       ├── config/
 │       │   └── SecurityConfig.kt      # Spring Security 설정 (JWT/Session)
 │       ├── controller/
@@ -28,7 +28,7 @@ test-web/
 
 각 공통 모듈에 대한 테스트 코드는 해당 모듈 이름의 패키지 하위에 위치합니다:
 
-- `commonauth/` - `core-security` 모듈 관련 코드
+- `coreauth/` - `core-security` 모듈 관련 코드
 - `(향후 추가될 모듈)/` - 예: `commonlog/`, `commondb/` 등
 
 이러한 구조를 통해 여러 공통 모듈을 동시에 테스트하면서도 각 모듈의 기능을 명확하게 구분할 수 있습니다.
@@ -44,10 +44,10 @@ test-web/
 - 세션 기반 인증 모드 지원
 
 **관련 파일:**
-- `commonauth/config/SecurityConfig.kt` - Security 설정
-- `commonauth/controller/JwtAuthController.kt` - JWT 로그인 API
-- `commonauth/controller/UserController.kt` - 인증이 필요한 API
-- `commonauth/controller/PublicController.kt` - 공개 API
+- `coreauth/config/SecurityConfig.kt` - Security 설정
+- `coreauth/controller/JwtAuthController.kt` - JWT 로그인 API
+- `coreauth/controller/UserController.kt` - 인증이 필요한 API
+- `coreauth/controller/PublicController.kt` - 공개 API
 
 ## API 엔드포인트
 
@@ -222,7 +222,7 @@ curl -X POST http://localhost:8080/api/session/logout \
 JWT 모드에서는 `JwtAuthenticationFilter`로 토큰 인증을 처리합니다.
 
 ```kotlin
-package rubit.testweb.commonauth.config
+package rubit.testweb.coreauth.config
 
 @Configuration
 @EnableWebSecurity
@@ -256,7 +256,7 @@ class SecurityConfig {
 테스트 계정은 애플리케이션 시작 시 JPA로 저장됩니다.
 
 ```kotlin
-package rubit.testweb.commonauth.controller
+package rubit.testweb.coreauth.controller
 
 @RestController
 @RequestMapping("/api/session")
@@ -284,7 +284,7 @@ class SessionAuthController(
 `AuthenticationManager`로 인증한 뒤 `JwtTokenProvider`로 토큰을 생성합니다.
 
 ```kotlin
-package rubit.testweb.commonauth.controller
+package rubit.testweb.coreauth.controller
 
 @RestController
 @RequestMapping("/api/auth")
@@ -309,7 +309,7 @@ class JwtAuthController(
 `@PreAuthorize` 어노테이션을 사용하여 역할 기반 접근 제어를 구현합니다.
 
 ```kotlin
-package rubit.testweb.commonauth.controller
+package rubit.testweb.coreauth.controller
 
 @RestController
 @RequestMapping("/api/users")
