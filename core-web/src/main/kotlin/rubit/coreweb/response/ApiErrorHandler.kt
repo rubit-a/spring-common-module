@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.NoHandlerFoundException
+import rubit.coreweb.validation.ConstraintPathNormalizer
 
 @RestControllerAdvice
 class ApiErrorHandler {
@@ -39,7 +40,7 @@ class ApiErrorHandler {
         ex: ConstraintViolationException
     ): ResponseEntity<ApiResponse<Nothing>> {
         val violations = ex.constraintViolations
-            .groupBy { it.propertyPath.toString() }
+            .groupBy { ConstraintPathNormalizer.normalize(it.propertyPath) }
             .mapValues { entry -> entry.value.map { it.message } }
         val details = mapOf("violations" to violations)
         return errorResponse(ErrorCode.VALIDATION_ERROR, details = details)

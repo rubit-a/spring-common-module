@@ -70,6 +70,20 @@ core:
 - `FORBIDDEN` (403)
 - `INTERNAL_ERROR` (500)
 
+## 검증 유틸
+
+커스텀 제약 어노테이션:
+
+- `@EnumValue(enumClass = SampleStatus::class)`
+- `@DateRange(min = "2025-01-01", max = "2025-12-31")`
+- `@DateRange(min = "2025-01-01", max = "2025-12-31", type = DateRangeType.DATE)`
+- `@PatternValue(regexp = "^[a-z]+$")`
+
+`ConstraintViolationException` 발생 시 경로는 최대한 파라미터/필드명으로 정규화됩니다.
+`DateRangeType`으로 문자열 입력의 해석 타입을 지정할 수 있습니다.
+기본 포맷은 `DATE=yyyy-MM-dd`, `DATE_TIME=yyyy-MM-dd'T'HH:mm:ss`, `TIME=HH:mm:ss` 입니다.
+`format` 파라미터는 제공하지 않으며, 타입별 기본 포맷을 사용합니다.
+
 ## Web/Jackson 설정
 
 `core-web`은 Jackson/ObjectMapper, JavaTime 포맷, CORS, 공통 컨버터 설정을 제공합니다.
