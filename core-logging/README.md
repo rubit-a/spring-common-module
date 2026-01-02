@@ -7,6 +7,8 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 로깅 �
 - 요청 ID 생성/전파
 - MDC에 요청 ID 주입
 - 응답 헤더에 요청 ID 설정
+- 분산 추적 헤더(traceparent/B3)에서 traceId/spanId 추출 후 MDC 주입
+- AOP 기반 실행 시간 로깅
 
 ## 설정
 
@@ -18,6 +20,16 @@ core:
       header: X-Request-Id
       mdc-key: requestId
       generate-if-missing: true
+    trace:
+      enabled: true
+      mdc-trace-id-key: traceId
+      mdc-span-id-key: spanId
+      generate-if-missing: true
+    aop:
+      enabled: false
+      slow-threshold-ms: 0
+      log-args: false
+      log-result: false
 ```
 
 ## 사용 방법
@@ -32,19 +44,38 @@ dependencies {
 
 ## 로그 패턴 예시
 
-Logback 콘솔 패턴에서 MDC 값을 출력하려면 `%X{requestId}`를 사용합니다.
+Logback 콘솔 패턴에서 MDC 값을 출력하려면 `%X{requestId}`, `%X{traceId}`, `%X{spanId}`를 사용합니다.
 
 ```yaml
 logging:
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{requestId}] %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [req=%X{requestId} trace=%X{traceId} span=%X{spanId}] %logger{36} - %msg%n"
 ```
 
 로그 예시:
 
 ```
-2025-01-02 10:15:30.123 INFO  [req-123] rubit.api.SampleController - handled request
+
+## AOP 로깅 사용
+
+실행 시간 로깅이 필요한 메서드/클래스에 `@LogExecutionTime`을 붙입니다.
+
+```kotlin
+import rubit.corelogging.aop.LogExecutionTime
+
+@LogExecutionTime
+fun doSomething() {
+    // ...
+}
 ```
+2025-01-02 10:15:30.123 INFO  [req-123 trace=4bf92f3577b34da6a3ce929d0e0e4736 span=00f067aa0ba902b7] rubit.api.SampleController - handled request
+```
+
+## 분산 추적 헤더 지원
+
+- W3C Trace Context: `traceparent`
+- B3 Single: `b3`
+- B3 Multi: `X-B3-TraceId`, `X-B3-SpanId`
 
 ## Logback 설정 예시
 
