@@ -6,6 +6,7 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 모듈 �
 
 ```
 spring-common-module/
+├── core-logging/           # 공통 로깅 유틸 모듈
 ├── core-security/          # 인증 공통 라이브러리 (JWT/Session)
 ├── core-web/               # 공통 Web 유틸 모듈
 └── test-web/               # core-security 사용 예제 프로젝트
@@ -32,7 +33,13 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 Web 관�
 
 **자세한 내용:** [core-web/README.md](core-web/README.md)
 
-### 3. test-web
+### 3. core-logging
+
+Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 로깅 유틸 모듈입니다.
+
+**자세한 내용:** [core-logging/README.md](core-logging/README.md)
+
+### 4. test-web
 
 `core-security` 모듈을 활용하는 실제 웹 애플리케이션 예제입니다.
 
@@ -51,6 +58,7 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 Web 관�
 ```bash
 cd spring-common-module
 ./core-security/gradlew build
+./gradlew :core-logging:build
 ./gradlew :core-web:build
 ```
 
@@ -88,6 +96,7 @@ curl http://localhost:8080/api/users/me \
 rootProject.name = "spring-common-module"
 
 include("core-security")
+include("core-logging")
 include("core-web")
 include("test-web")
 ```
@@ -196,10 +205,12 @@ class SecurityConfig {
 ```bash
 # 전체 프로젝트 빌드
 ./core-security/gradlew build
+./gradlew :core-logging:build
 ./gradlew :core-web:build
 
 # 특정 모듈만 빌드
 ./core-security/gradlew :core-security:build
+./gradlew :core-logging:build
 ./gradlew :core-web:build
 ./core-security/gradlew :test-web:build
 
