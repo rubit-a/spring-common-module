@@ -26,3 +26,6 @@ core:
   web:
     response:
       enabled: true
+  logging:
+    aop:
+      enabled: true
