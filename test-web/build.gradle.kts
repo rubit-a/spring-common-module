@@ -22,6 +22,7 @@ repositories {
 
 dependencies {
     // Common Auth Module
+    implementation(project(":core-logging"))
     implementation(project(":core-security"))
     implementation(project(":core-web"))
 
