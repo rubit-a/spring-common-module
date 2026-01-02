@@ -11,9 +11,10 @@ test-web/
 │   │
 │   └── commonauth/                    # common-auth 모듈 관련 코드
 │       ├── config/
-│       │   └── SecurityConfig.kt      # Spring Security 설정
+│       │   └── SecurityConfig.kt      # Spring Security 설정 (JWT/Session)
 │       ├── controller/
-│       │   ├── AuthController.kt      # 인증 관련 API (로그인, 토큰 검증)
+│       │   ├── JwtAuthController.kt   # JWT 인증 관련 API (로그인, 토큰 검증)
+│       │   ├── SessionAuthController.kt # 세션 로그인 API
 │       │   ├── PublicController.kt    # 공개 API (인증 불필요)
 │       │   └── UserController.kt      # 보호된 API (인증 필요)
 │       └── dto/
@@ -34,16 +35,17 @@ test-web/
 
 ## 현재 통합된 모듈
 
-### 1. common-auth (JWT 인증)
+### 1. common-auth (JWT/Session 인증)
 
 **주요 기능:**
 - JWT Access Token 및 Refresh Token 발급
 - 토큰 기반 인증 및 권한 관리
 - Spring Security 통합
+- 세션 기반 인증 모드 지원
 
 **관련 파일:**
 - `commonauth/config/SecurityConfig.kt` - Security 설정
-- `commonauth/controller/AuthController.kt` - 로그인 API
+- `commonauth/controller/JwtAuthController.kt` - JWT 로그인 API
 - `commonauth/controller/UserController.kt` - 인증이 필요한 API
 - `commonauth/controller/PublicController.kt` - 공개 API
 
@@ -58,6 +60,11 @@ test-web/
 - `GET /api/auth/user-info` - 토큰에서 사용자 정보 추출
 - `GET /api/public/hello` - 공개 엔드포인트
 - `GET /api/public/health` - 헬스 체크
+
+#### 1-1. Session 모드 전용 엔드포인트
+
+- `POST /api/session/login` - 로그인 (세션 생성)
+- `POST /api/session/logout` - 로그아웃 (세션 삭제)
 
 #### 2. 인증이 필요한 엔드포인트 (보호)
 
@@ -181,11 +188,38 @@ curl http://localhost:8080/api/users/admin \
 
 일반 사용자 토큰으로 요청하면 403 Forbidden 에러 발생.
 
+### 5. Session 모드 로그인/요청
+
+`application.yml`에서 `auth.mode: session`으로 변경한 뒤 사용하세요.
+
+로그인 (세션 쿠키 저장):
+```bash
+curl -X POST http://localhost:8080/api/session/login \
+  -H "Content-Type: application/json" \
+  -c cookies.txt \
+  -d '{
+    "username": "testuser",
+    "password": "password123"
+  }'
+```
+
+세션 쿠키로 보호된 엔드포인트 호출:
+```bash
+curl http://localhost:8080/api/users/me \
+  -b cookies.txt
+```
+
+로그아웃:
+```bash
+curl -X POST http://localhost:8080/api/session/logout \
+  -b cookies.txt
+```
+
 ## common-auth 모듈 구현 예제
 
 ### SecurityConfig.kt
 
-`common-auth`의 `JwtAuthenticationFilter`를 사용하여 JWT 인증을 자동으로 처리합니다.
+JWT 모드에서는 `JwtAuthenticationFilter`로 토큰 인증을 처리합니다.
 
 ```kotlin
 package rubit.testweb.commonauth.config
@@ -196,6 +230,7 @@ package rubit.testweb.commonauth.config
 class SecurityConfig {
 
     @Bean
+    @ConditionalOnProperty(prefix = "auth", name = ["mode"], havingValue = "jwt", matchIfMissing = true)
     fun jwtSecurityFilterChain(
         http: HttpSecurity,
         jwtAuthenticationFilter: JwtAuthenticationFilter
@@ -214,27 +249,56 @@ class SecurityConfig {
 }
 ```
 
-### AuthController.kt
+### SessionAuthController.kt
 
-`common-auth`의 `JwtTokenProvider`를 주입받아 토큰을 생성합니다.
+세션 기반 로그인 시에는 인증을 수행하고 세션을 생성합니다.
+세션 사용자 조회는 JPA 기반 `UserDetailsService`를 사용합니다.
+테스트 계정은 애플리케이션 시작 시 JPA로 저장됩니다.
+
+```kotlin
+package rubit.testweb.commonauth.controller
+
+@RestController
+@RequestMapping("/api/session")
+class SessionAuthController(
+    private val authenticationManager: AuthenticationManager
+) {
+    @PostMapping("/login")
+    fun login(@RequestBody request: LoginRequest, httpRequest: HttpServletRequest): UserInfoResponse {
+        val authentication = authenticationManager.authenticate(
+            UsernamePasswordAuthenticationToken(request.username, request.password)
+        )
+        SecurityContextHolder.getContext().authentication = authentication
+        httpRequest.session
+
+        return UserInfoResponse(
+            username = authentication.name,
+            authorities = authentication.authorities.mapNotNull { it.authority }
+        )
+    }
+}
+```
+
+### JwtAuthController.kt
+
+`AuthenticationManager`로 인증한 뒤 `JwtTokenProvider`로 토큰을 생성합니다.
 
 ```kotlin
 package rubit.testweb.commonauth.controller
 
 @RestController
 @RequestMapping("/api/auth")
-class AuthController(
-    private val jwtTokenProvider: JwtTokenProvider
+class JwtAuthController(
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val authenticationManager: AuthenticationManager
 ) {
     @PostMapping("/login")
     fun login(@RequestBody request: LoginRequest): TokenResponse {
-        val accessToken = jwtTokenProvider.generateAccessToken(
-            username = request.username,
-            authorities = listOf("ROLE_USER")
+        val authentication = authenticationManager.authenticate(
+            UsernamePasswordAuthenticationToken(request.username, request.password)
         )
-        val refreshToken = jwtTokenProvider.generateRefreshToken(
-            username = request.username
-        )
+        val accessToken = jwtTokenProvider.generateAccessToken(authentication)
+        val refreshToken = jwtTokenProvider.generateRefreshToken(authentication.name)
         return TokenResponse(accessToken, refreshToken)
     }
 }
@@ -264,15 +328,16 @@ class UserController {
 
 ## 테스트 계정
 
-로그인 API는 데모 목적으로 간단한 인증 로직을 사용합니다:
+모드별로 인증 방식이 다릅니다:
 
-- **일반 사용자**: username 길이가 3자 이상인 모든 사용자
-  - 권한: `ROLE_USER`
+- **JWT 모드**: 앱 시작 시 JPA로 계정 초기화
+  - `testuser/password123` -> `ROLE_USER`
+  - `admin/admin123` -> `ROLE_ADMIN`, `ROLE_USER`
+- **Session 모드**: 앱 시작 시 JPA로 계정 초기화
+  - `testuser/password123` -> `ROLE_USER`
+  - `admin/admin123` -> `ROLE_ADMIN`, `ROLE_USER`
 
-- **관리자**: username이 "admin"인 경우
-  - 권한: `ROLE_ADMIN`, `ROLE_USER`
-
-실제 프로덕션 환경에서는 데이터베이스와 비밀번호 암호화를 사용해야 합니다.
+실제 프로덕션 환경에서는 사용자 테이블 설계와 비밀번호 암호화를 사용해야 합니다.
 
 ## 설정
 
@@ -282,9 +347,21 @@ class UserController {
 spring:
   application:
     name: test-web
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
 
 server:
   port: 8080
+
+# 인증 모드 선택 (jwt 또는 session)
+auth:
+  mode: jwt
 
 # common-auth 모듈 설정
 jwt:
@@ -302,8 +379,10 @@ dependencies {
     implementation(project(":common-auth"))
 
     // Spring Boot
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")
+    runtimeOnly("com.h2database:h2")
 }
 ```
 

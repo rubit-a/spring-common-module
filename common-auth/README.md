@@ -1,6 +1,6 @@
-# Common Auth - JWT 인증 공통 모듈
+# Common Auth - 인증 공통 모듈 (JWT/Session)
 
-다른 Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 JWT 인증 라이브러리입니다.
+다른 Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 인증 라이브러리입니다.
 
 ## 기능
 
@@ -8,6 +8,7 @@
 - JWT Refresh Token 생성
 - Spring Security와 통합된 JWT 인증 필터
 - Auto Configuration을 통한 자동 설정
+- 인증 모드 선택 지원 (`jwt` 또는 `session`)
 
 ## 사용 방법
 
@@ -25,9 +26,12 @@ dependencies {
 
 ### 2. 설정 추가
 
-`application.yml` 또는 `application.properties`에 JWT 설정을 추가하세요:
+`application.yml` 또는 `application.properties`에 설정을 추가하세요:
 
 ```yaml
+auth:
+  mode: jwt
+
 jwt:
   secret-key: your-secret-key-here-minimum-256-bits-long
   access-token-expiration: 3600000  # 1시간 (밀리초)
@@ -38,6 +42,7 @@ jwt:
 또는 `application.properties`:
 
 ```properties
+auth.mode=jwt
 jwt.secret-key=your-secret-key-here-minimum-256-bits-long
 jwt.access-token-expiration=3600000
 jwt.refresh-token-expiration=604800000
@@ -46,6 +51,19 @@ jwt.issuer=your-app-name
 
 **중요**: `secret-key`는 최소 256비트(32자) 이상이어야 합니다.
 
+#### Session 모드
+
+JWT 없이 세션 기반으로 동작하려면 다음과 같이 설정하세요:
+
+```yaml
+auth:
+  mode: session
+```
+
+Session 모드는 기본적으로 `SessionCreationPolicy.IF_REQUIRED`를 사용합니다.
+필요한 인증/인가 정책은 애플리케이션에서 `SecurityFilterChain`을 정의해 주세요.
+`auth.mode=session`일 때는 JWT 자동 설정이 비활성화됩니다.
+
 ### 3. JWT 토큰 사용
 
 #### 3.1 토큰 생성
@@ -53,7 +71,7 @@ jwt.issuer=your-app-name
 ```kotlin
 @RestController
 @RequestMapping("/auth")
-class AuthController(
+class JwtAuthController(
     private val jwtTokenProvider: JwtTokenProvider
 ) {
 
@@ -156,6 +174,12 @@ curl -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." \
 ```
 
 ## 구성 요소
+
+### Auth Mode
+인증 방식 선택을 위한 설정입니다.
+
+설정 가능한 속성:
+- `auth.mode`: 인증 모드 (`jwt` 또는 `session`, 기본값: `jwt`)
 
 ### JwtTokenProvider
 JWT 토큰 생성 및 검증을 담당하는 핵심 클래스입니다.

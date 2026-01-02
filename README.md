@@ -6,7 +6,7 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 모듈 �
 
 ```
 spring-common-module/
-├── common-auth/          # JWT 인증 공통 라이브러리
+├── common-auth/          # 인증 공통 라이브러리 (JWT/Session)
 └── test-web/             # common-auth 사용 예제 프로젝트
 ```
 
@@ -14,13 +14,14 @@ spring-common-module/
 
 ### 1. common-auth
 
-다른 Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 JWT 인증 라이브러리입니다.
+다른 Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 인증 라이브러리입니다.
 
 **주요 기능:**
 - JWT Access Token 및 Refresh Token 생성
 - JWT 토큰 검증
 - Spring Security 통합 (자동 인증 필터)
 - Spring Boot Auto Configuration 지원
+- 인증 모드 선택 지원 (`jwt` 또는 `session`)
 
 **자세한 내용:** [common-auth/README.md](common-auth/README.md)
 
@@ -115,6 +116,9 @@ dependencies {
 ### 2. application.yml 설정
 
 ```yaml
+auth:
+  mode: jwt
+
 jwt:
   secret-key: your-secret-key-here-minimum-256-bits-long
   access-token-expiration: 3600000
@@ -126,7 +130,7 @@ jwt:
 
 ```kotlin
 @RestController
-class AuthController(
+class JwtAuthController(
     private val jwtTokenProvider: JwtTokenProvider
 ) {
     @PostMapping("/login")

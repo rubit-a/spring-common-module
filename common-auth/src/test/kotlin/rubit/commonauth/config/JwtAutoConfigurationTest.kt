@@ -68,4 +68,17 @@ class JwtAutoConfigurationTest {
                 assertFalse(context.containsBean("jwtTokenProvider"))
             }
     }
+
+    @Test
+    @DisplayName("auth.mode=session이면 JwtTokenProvider 빈이 등록되지 않는다")
+    fun jwtTokenProviderBeanIsNotRegisteredWithSessionMode() {
+        contextRunner
+            .withPropertyValues(
+                "auth.mode=session",
+                "jwt.secret-key=test-secret-key-for-jwt-must-be-at-least-256-bits-long-for-hmac-sha256"
+            )
+            .run { context ->
+                assertFalse(context.containsBean("jwtTokenProvider"))
+            }
+    }
 }

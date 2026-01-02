@@ -16,6 +16,7 @@ import rubit.commonauth.jwt.JwtTokenProvider
 @AutoConfiguration
 @EnableWebSecurity
 @EnableConfigurationProperties(JwtProperties::class)
+@ConditionalOnProperty(prefix = "auth", name = ["mode"], havingValue = "jwt", matchIfMissing = true)
 @ConditionalOnProperty(prefix = "jwt", name = ["secret-key"])
 class JwtAutoConfiguration(
     private val jwtProperties: JwtProperties

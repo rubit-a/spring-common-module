@@ -1,5 +1,8 @@
 package rubit.testweb.commonauth.controller
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.web.bind.annotation.*
 import rubit.commonauth.jwt.JwtTokenProvider
 import rubit.testweb.commonauth.dto.LoginRequest
@@ -8,31 +11,22 @@ import rubit.testweb.commonauth.dto.UserInfoResponse
 
 @RestController
 @RequestMapping("/api/auth")
-class AuthController(
-    private val jwtTokenProvider: JwtTokenProvider
+@ConditionalOnProperty(prefix = "auth", name = ["mode"], havingValue = "jwt", matchIfMissing = true)
+class JwtAuthController(
+    private val jwtTokenProvider: JwtTokenProvider,
+    private val authenticationManager: AuthenticationManager
 ) {
 
     @PostMapping("/login")
     fun login(@RequestBody request: LoginRequest): TokenResponse {
-        // In a real application, you would verify the credentials against a database
-        // For this demo, we'll accept any credentials with username length > 3
-        if (request.username.length < 3) {
-            throw IllegalArgumentException("Invalid credentials")
-        }
-
-        val authorities = if (request.username == "admin") {
-            listOf("ROLE_ADMIN", "ROLE_USER")
-        } else {
-            listOf("ROLE_USER")
-        }
-
-        val accessToken = jwtTokenProvider.generateAccessToken(
-            username = request.username,
-            authorities = authorities
+        val authentication = authenticationManager.authenticate(
+            UsernamePasswordAuthenticationToken(request.username, request.password)
         )
 
+        val accessToken = jwtTokenProvider.generateAccessToken(authentication)
+
         val refreshToken = jwtTokenProvider.generateRefreshToken(
-            username = request.username
+            username = authentication.name
         )
 
         return TokenResponse(

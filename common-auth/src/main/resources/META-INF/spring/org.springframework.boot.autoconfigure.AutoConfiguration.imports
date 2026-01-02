@@ -1,1 +1,2 @@
 rubit.commonauth.config.JwtAutoConfiguration
+rubit.commonauth.config.SessionAutoConfiguration
