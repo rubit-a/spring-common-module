@@ -9,7 +9,7 @@ spring-common-module/
 ├── core-logging/           # 공통 로깅 유틸 모듈
 ├── core-security/          # 인증 공통 라이브러리 (JWT/Session)
 ├── core-web/               # 공통 Web 유틸 모듈
-└── test-web/               # core-security 사용 예제 프로젝트
+└── core-test/               # core-security 사용 예제 프로젝트
 ```
 
 ## 모듈 소개
@@ -39,7 +39,7 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 로깅 �
 
 **자세한 내용:** [core-logging/README.md](core-logging/README.md)
 
-### 4. test-web
+### 4. core-test
 
 `core-security` 모듈을 활용하는 실제 웹 애플리케이션 예제입니다.
 
@@ -49,7 +49,7 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 로깅 �
 - 역할 기반 접근 제어 (RBAC)
 - 공개 엔드포인트
 
-**자세한 내용:** [test-web/README.md](test-web/README.md)
+**자세한 내용:** [core-test/README.md](core-test/README.md)
 
 ## 빠른 시작
 
@@ -62,10 +62,10 @@ cd spring-common-module
 ./gradlew :core-web:build
 ```
 
-### 2. test-web 애플리케이션 실행
+### 2. core-test 애플리케이션 실행
 
 ```bash
-cd test-web
+cd core-test
 ../core-security/gradlew bootRun
 ```
 
@@ -98,15 +98,15 @@ rootProject.name = "spring-common-module"
 include("core-security")
 include("core-logging")
 include("core-web")
-include("test-web")
+include("core-test")
 ```
 
 ### 모듈 간 의존성
 
-`test-web`은 `core-security`를 의존성으로 사용합니다:
+`core-test`은 `core-security`를 의존성으로 사용합니다:
 
 ```kotlin
-// test-web/build.gradle.kts
+// core-test/build.gradle.kts
 dependencies {
     implementation(project(":core-security"))
     // ...
@@ -212,7 +212,7 @@ class SecurityConfig {
 ./core-security/gradlew :core-security:build
 ./gradlew :core-logging:build
 ./gradlew :core-web:build
-./core-security/gradlew :test-web:build
+./core-security/gradlew :core-test:build
 
 # 테스트 실행
 ./core-security/gradlew test

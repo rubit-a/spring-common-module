@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: core-test
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+server:
+  port: 8080
+
+auth:
+  mode: jwt
+
+jwt:
+  secret-key: my-super-secret-key-for-jwt-token-signing-must-be-at-least-256-bits-long
+  access-token-expiration: 3600000  # 1 hour
+  refresh-token-expiration: 604800000  # 7 days
+  issuer: core-test
+
+core:
+  web:
+    response:
+      enabled: true
