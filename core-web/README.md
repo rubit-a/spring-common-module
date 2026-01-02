@@ -70,6 +70,41 @@ core:
 - `FORBIDDEN` (403)
 - `INTERNAL_ERROR` (500)
 
+## Web/Jackson 설정
+
+`core-web`은 Jackson/ObjectMapper, JavaTime 포맷, CORS, 공통 컨버터 설정을 제공합니다.
+기본값은 비활성이며 아래 설정으로 활성화할 수 있습니다.
+
+```yaml
+core:
+  web:
+    jackson:
+      enabled: true
+      time-zone: "Asia/Seoul"
+      serialization-inclusion: NON_NULL
+      date-format: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX"
+      naming-strategy: SNAKE_CASE
+      fail-on-unknown-properties: false
+      write-dates-as-timestamps: false
+    format:
+      enabled: true
+      date: "yyyy-MM-dd"
+      date-time: "yyyy-MM-dd'T'HH:mm:ss"
+      time: "HH:mm:ss"
+    cors:
+      enabled: true
+      path-pattern: "/**"
+      allowed-origin-patterns: ["*"]
+      allowed-methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
+      allowed-headers: ["*"]
+      exposed-headers: []
+      allow-credentials: false
+      max-age: 3600
+```
+
+- `format`은 요청 파라미터/PathVariable 변환에 적용됩니다.
+- `jackson.enabled=true` + `format.enabled=true`일 때 JavaTime 직렬화 포맷에도 동일 패턴이 적용됩니다.
+
 ## 사용 방법
 
 `build.gradle.kts`에 다음 의존성을 추가하세요:

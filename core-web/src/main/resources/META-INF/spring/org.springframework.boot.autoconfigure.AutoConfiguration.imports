@@ -1,2 +1,3 @@
 rubit.coreweb.config.CoreWebAutoConfiguration
 rubit.coreweb.config.ResponseAutoConfiguration
+rubit.coreweb.config.WebConfigAutoConfiguration
