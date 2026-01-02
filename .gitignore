@@ -1,6 +1,8 @@
 # Gradle
 .gradle/
 **/build/
+**/bin/
+**/out/
 
 # IntelliJ IDEA
 .idea/

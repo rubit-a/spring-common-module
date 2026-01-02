@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @SpringBootTest(
@@ -78,6 +79,56 @@ class ResponseFormatIntegrationTest {
             .andExpect(jsonPath("$.error.code").value("INVALID_REQUEST"))
     }
 
+    @Test
+    @DisplayName("파라미터 누락은 MISSING_PARAMETER로 변환한다")
+    fun wrapsMissingParameter() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/test/param")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.error.code").value("MISSING_PARAMETER"))
+    }
+
+    @Test
+    @DisplayName("타입 불일치는 TYPE_MISMATCH로 변환한다")
+    fun wrapsTypeMismatch() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/test/param")
+                .param("id", "abc")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isBadRequest)
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.error.code").value("TYPE_MISMATCH"))
+    }
+
+    @Test
+    @DisplayName("허용되지 않은 메서드는 METHOD_NOT_ALLOWED로 변환한다")
+    fun wrapsMethodNotAllowed() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.post("/test/ok")
+                .accept(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isMethodNotAllowed)
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.error.code").value("METHOD_NOT_ALLOWED"))
+    }
+
+    @Test
+    @DisplayName("지원하지 않는 Content-Type은 UNSUPPORTED_MEDIA_TYPE으로 변환한다")
+    fun wrapsUnsupportedMediaType() {
+        mockMvc.perform(
+            MockMvcRequestBuilders.post("/test/validate")
+                .contentType(MediaType.TEXT_PLAIN)
+                .content("name")
+        )
+            .andExpect(status().isUnsupportedMediaType)
+            .andExpect(jsonPath("$.success").value(false))
+            .andExpect(jsonPath("$.error.code").value("UNSUPPORTED_MEDIA_TYPE"))
+    }
+
 }
 
 @SpringBootApplication
@@ -91,7 +142,7 @@ class TestController {
         return mapOf("value" to "pong")
     }
 
-    @PostMapping("/validate")
+    @PostMapping("/validate", consumes = [MediaType.APPLICATION_JSON_VALUE])
     fun validate(@Valid @RequestBody request: TestRequest): TestRequest {
         return request
     }
@@ -99,6 +150,11 @@ class TestController {
     @GetMapping("/illegal")
     fun illegal(): String {
         throw IllegalArgumentException("invalid request")
+    }
+
+    @GetMapping("/param")
+    fun param(@RequestParam id: Long): String {
+        return id.toString()
     }
 }
 

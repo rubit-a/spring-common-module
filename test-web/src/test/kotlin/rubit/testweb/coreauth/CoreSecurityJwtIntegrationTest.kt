@@ -86,6 +86,7 @@ class CoreSecurityJwtIntegrationTest {
             .andReturn()
 
         val responseJson = objectMapper.readTree(result.response.contentAsString)
-        return responseJson["accessToken"].asText()
+        val tokenNode = responseJson.get("accessToken")
+        return tokenNode?.textValue() ?: error("Missing accessToken in response")
     }
 }

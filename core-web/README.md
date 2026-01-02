@@ -56,6 +56,20 @@ core:
 }
 ```
 
+## 에러 코드
+
+- `VALIDATION_ERROR` (400)
+- `INVALID_REQUEST` (400)
+- `MALFORMED_REQUEST` (400)
+- `MISSING_PARAMETER` (400)
+- `TYPE_MISMATCH` (400)
+- `METHOD_NOT_ALLOWED` (405)
+- `UNSUPPORTED_MEDIA_TYPE` (415)
+- `NOT_FOUND` (404)
+- `UNAUTHORIZED` (401)
+- `FORBIDDEN` (403)
+- `INTERNAL_ERROR` (500)
+
 ## 사용 방법
 
 `build.gradle.kts`에 다음 의존성을 추가하세요:
