@@ -17,6 +17,8 @@ val nexusSnapshotsUrl = providers.gradleProperty("nexusSnapshotsUrl").orNull
     ?: "$nexusBaseUrl/repository/maven-snapshots/"
 val nexusUsername = providers.gradleProperty("nexusUsername").orNull ?: System.getenv("NEXUS_USERNAME")
 val nexusPassword = providers.gradleProperty("nexusPassword").orNull ?: System.getenv("NEXUS_PASSWORD")
+val autoPublish = (providers.gradleProperty("autoPublish").orNull ?: "true").toBoolean()
+val refreshSnapshots = (providers.gradleProperty("refreshSnapshots").orNull ?: "true").toBoolean()
 
 allprojects {
     group = "rubit"
@@ -26,6 +28,13 @@ allprojects {
         maven {
             url = uri(nexusPublicUrl)
             isAllowInsecureProtocol = nexusPublicUrl.startsWith("http://")
+        }
+    }
+
+    if (refreshSnapshots) {
+        configurations.configureEach {
+            resolutionStrategy.cacheChangingModulesFor(0, "seconds")
+            resolutionStrategy.cacheDynamicVersionsFor(0, "seconds")
         }
     }
 }
@@ -58,6 +67,12 @@ subprojects {
                         }
                     }
                 }
+            }
+        }
+
+        if (autoPublish) {
+            tasks.matching { it.name == "build" }.configureEach {
+                dependsOn("publish")
             }
         }
     }

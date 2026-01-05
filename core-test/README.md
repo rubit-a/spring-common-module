@@ -49,6 +49,16 @@ core-test/
 - `coreauth/controller/UserController.kt` - 인증이 필요한 API
 - `coreauth/controller/PublicController.kt` - 공개 API
 
+### 2. core-data (공통 JPA 인프라)
+
+**주요 기능:**
+- BaseEntity/BaseAuditEntity 공통 컬럼 제공
+- JPA Auditing 자동 활성화
+
+**관련 파일:**
+- `coredata/entity/SampleEntity.kt` - BaseAuditEntity 사용 예제
+- `coredata/controller/SampleController.kt` - 샘플 CRUD API
+
 ## API 엔드포인트
 
 ### core-security 모듈 테스트 API
@@ -71,6 +81,12 @@ core-test/
 - `GET /api/users/me` - 현재 로그인한 사용자 정보
 - `GET /api/users/profile` - 사용자 프로필
 - `GET /api/users/admin` - 관리자 전용 (ROLE_ADMIN 필요)
+
+### core-data 모듈 테스트 API (인증 필요)
+
+- `POST /api/data/samples` - 샘플 생성
+- `GET /api/data/samples` - 샘플 목록
+- `PATCH /api/data/samples/{id}` - 샘플 수정
 
 ## 실행 방법
 

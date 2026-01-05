@@ -282,6 +282,18 @@ nexusUsername=사용자
 nexusPassword=비밀번호
 ```
 
+### build 시 자동 배포/의존성 갱신
+
+`gradle.properties`에서 아래 설정을 켜면 `build` 실행 시 자동으로 `publish`가 함께 수행되고,
+SNAPSHOT 의존성은 매번 원격 저장소에서 다시 확인합니다.
+
+```properties
+autoPublish=true
+refreshSnapshots=true
+```
+
+비활성화하려면 `false`로 변경하세요.
+
 ## 기술 스택
 
 - **언어:** Kotlin 2.2.21
