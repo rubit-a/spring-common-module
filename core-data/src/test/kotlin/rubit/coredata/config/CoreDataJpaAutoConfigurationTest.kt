@@ -19,8 +19,8 @@ class CoreDataJpaAutoConfigurationTest {
     fun appliesJpaProperties() {
         contextRunner
             .withPropertyValues(
-                "core.data.jpa.physical-naming-strategy=org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy",
-                "core.data.jpa.implicit-naming-strategy=org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy",
+                "core.data.jpa.physical-naming-strategy=org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy",
+                "core.data.jpa.implicit-naming-strategy=org.springframework.boot.hibernate.SpringImplicitNamingStrategy",
                 "core.data.jpa.batch-size=25",
                 "core.data.jpa.fetch-size=50",
                 "core.data.jpa.time-zone=UTC"
@@ -32,11 +32,11 @@ class CoreDataJpaAutoConfigurationTest {
                 customizer.customize(hibernateProperties)
 
                 assertEquals(
-                    "org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy",
+                    "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy",
                     hibernateProperties["hibernate.physical_naming_strategy"]
                 )
                 assertEquals(
-                    "org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy",
+                    "org.springframework.boot.hibernate.SpringImplicitNamingStrategy",
                     hibernateProperties["hibernate.implicit_naming_strategy"]
                 )
                 assertEquals(25, hibernateProperties["hibernate.jdbc.batch_size"])

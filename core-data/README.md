@@ -50,8 +50,8 @@ core:
   data:
     auditing-enabled: true
     jpa:
-      physical-naming-strategy: "org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy"
-      implicit-naming-strategy: "org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
+      physical-naming-strategy: "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy"
+      implicit-naming-strategy: "org.springframework.boot.hibernate.SpringImplicitNamingStrategy"
       batch-size: 50
       fetch-size: 50
       time-zone: "UTC"
