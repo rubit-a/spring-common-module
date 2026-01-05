@@ -6,6 +6,7 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 모듈 �
 
 ```
 spring-common-module/
+├── core-data/              # 공통 데이터/JPA 인프라 모듈
 ├── core-logging/           # 공통 로깅 유틸 모듈
 ├── core-security/          # 인증 공통 라이브러리 (JWT/Session)
 ├── core-web/               # 공통 Web 유틸 모듈
@@ -39,7 +40,13 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 로깅 �
 
 **자세한 내용:** [core-logging/README.md](core-logging/README.md)
 
-### 4. core-test
+### 4. core-data
+
+Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 DB/JPA 인프라 모듈입니다.
+
+**자세한 내용:** [core-data/README.md](core-data/README.md)
+
+### 5. core-test
 
 `core-security` 모듈을 활용하는 실제 웹 애플리케이션 예제입니다.
 
@@ -58,6 +65,7 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 로깅 �
 ```bash
 cd spring-common-module
 ./core-security/gradlew build
+./gradlew :core-data:build
 ./gradlew :core-logging:build
 ./gradlew :core-web:build
 ```
@@ -98,6 +106,7 @@ rootProject.name = "spring-common-module"
 include("core-security")
 include("core-logging")
 include("core-web")
+include("core-data")
 include("core-test")
 ```
 
@@ -184,6 +193,95 @@ class SecurityConfig {
 }
 ```
 
+## Nexus 배포 및 의존 설정
+
+로컬 Nexus(기본 `http://localhost:8081`)를 통해 공통 모듈을 배포하고 의존합니다.
+
+### 1. Nexus 실행
+
+```bash
+cd ../nexus-repo
+docker-compose up -d
+```
+
+관리자 비밀번호 확인:
+```bash
+docker exec -it nexus-repo cat /nexus-data/admin.password
+```
+
+### 2. 인증 정보 설정
+
+환경 변수로 설정:
+```bash
+export NEXUS_USERNAME=admin
+export NEXUS_PASSWORD=비밀번호
+```
+
+또는 `gradle.properties`에 설정:
+```properties
+nexusUsername=admin
+nexusPassword=비밀번호
+```
+
+### 3. 모듈 배포
+
+```bash
+./gradlew :core-logging:publish
+./gradlew :core-security:publish
+./gradlew :core-data:publish
+./gradlew :core-web:publish
+```
+
+### 4. core-test 실행 (Nexus 의존)
+
+```bash
+./gradlew :core-test:bootRun
+```
+
+로컬 모듈을 직접 참조하려면:
+```bash
+./gradlew :core-test:bootRun -PuseLocalModules=true
+```
+
+### 5. 외부 프로젝트에서 사용
+
+```kotlin
+repositories {
+    maven { url = uri("http://localhost:8081/repository/maven-public/") }
+}
+
+dependencies {
+    implementation("rubit:core-logging:0.0.1-SNAPSHOT")
+    implementation("rubit:core-security:0.0.1-SNAPSHOT")
+    implementation("rubit:core-data:0.0.1-SNAPSHOT")
+    implementation("rubit:core-web:0.0.1-SNAPSHOT")
+}
+```
+
+> 저장소 주소를 변경하려면 `nexusBaseUrl`, `nexusPublicUrl`, `nexusReleasesUrl`, `nexusSnapshotsUrl` Gradle 속성을 사용하세요.
+
+### Nexus 경로 변경 시 설정
+
+Nexus 주소나 repository 이름이 변경된 경우, `gradle.properties`에서 덮어쓰면 됩니다.
+
+호스트/포트만 변경:
+```properties
+nexusBaseUrl=http://새주소:8082
+```
+
+repository 이름까지 변경:
+```properties
+nexusPublicUrl=http://새주소:8082/repository/custom-public/
+nexusSnapshotsUrl=http://새주소:8082/repository/custom-snapshots/
+nexusReleasesUrl=http://새주소:8082/repository/custom-releases/
+```
+
+인증 정보 변경:
+```properties
+nexusUsername=사용자
+nexusPassword=비밀번호
+```
+
 ## 기술 스택
 
 - **언어:** Kotlin 2.2.21
@@ -205,11 +303,13 @@ class SecurityConfig {
 ```bash
 # 전체 프로젝트 빌드
 ./core-security/gradlew build
+./gradlew :core-data:build
 ./gradlew :core-logging:build
 ./gradlew :core-web:build
 
 # 특정 모듈만 빌드
 ./core-security/gradlew :core-security:build
+./gradlew :core-data:build
 ./gradlew :core-logging:build
 ./gradlew :core-web:build
 ./core-security/gradlew :core-test:build

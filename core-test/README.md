@@ -375,8 +375,8 @@ jwt:
 
 ```kotlin
 dependencies {
-    // 공통 모듈
-    implementation(project(":core-security"))
+    // 공통 모듈 (Nexus)
+    implementation("rubit:core-security:0.0.1-SNAPSHOT")
 
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -386,6 +386,8 @@ dependencies {
 }
 ```
 
+로컬 모듈을 직접 참조하려면 `-PuseLocalModules=true` 옵션으로 실행하세요.
+
 ## 새로운 공통 모듈 추가하기
 
 새로운 공통 모듈을 테스트하려면:
@@ -393,8 +395,8 @@ dependencies {
 1. **의존성 추가** (`build.gradle.kts`):
 ```kotlin
 dependencies {
-    implementation(project(":core-security"))
-    implementation(project(":새로운-모듈"))  // 추가
+    implementation("rubit:core-security:0.0.1-SNAPSHOT")
+    implementation("rubit:새로운-모듈:0.0.1-SNAPSHOT")  // 추가
 }
 ```
 

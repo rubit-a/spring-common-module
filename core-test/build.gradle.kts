@@ -16,15 +16,20 @@ java {
     }
 }
 
-repositories {
-    mavenCentral()
-}
+val useLocalModules = (findProperty("useLocalModules") as String?)?.toBoolean() ?: false
+val commonModuleVersion = project.version.toString()
 
 dependencies {
     // Common Auth Module
-    implementation(project(":core-logging"))
-    implementation(project(":core-security"))
-    implementation(project(":core-web"))
+    if (useLocalModules) {
+        implementation(project(":core-logging"))
+        implementation(project(":core-security"))
+        implementation(project(":core-web"))
+    } else {
+        implementation("rubit:core-logging:$commonModuleVersion")
+        implementation("rubit:core-security:$commonModuleVersion")
+        implementation("rubit:core-web:$commonModuleVersion")
+    }
 
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
