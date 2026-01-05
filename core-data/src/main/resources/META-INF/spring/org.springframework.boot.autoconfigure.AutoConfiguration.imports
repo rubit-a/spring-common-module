@@ -1,0 +1,2 @@
+rubit.coredata.config.CoreDataAutoConfiguration
+rubit.coredata.config.JpaAuditingAutoConfiguration
