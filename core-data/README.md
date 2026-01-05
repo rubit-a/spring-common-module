@@ -49,6 +49,12 @@ class AuditorConfig {
 core:
   data:
     auditing-enabled: true
+    jpa:
+      physical-naming-strategy: "org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy"
+      implicit-naming-strategy: "org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy"
+      batch-size: 50
+      fetch-size: 50
+      time-zone: "UTC"
 ```
 
 ## 참고
@@ -56,3 +62,4 @@ core:
 - `AuditorAware`를 등록하지 않으면 기본 구현이 `Optional.empty()`를 반환합니다.
 - `createdBy`/`updatedBy`는 `AuditorAware` 구현이 값을 제공해야 채워집니다.
 - `BaseEntity`의 `version` 필드는 낙관적 락(optimistic locking)에 사용됩니다.
+- JPA 설정은 Hibernate 설정 키로 적용됩니다 (`hibernate.physical_naming_strategy` 등).

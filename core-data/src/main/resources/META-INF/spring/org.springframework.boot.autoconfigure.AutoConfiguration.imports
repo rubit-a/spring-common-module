@@ -1,2 +1,3 @@
 rubit.coredata.config.CoreDataAutoConfiguration
+rubit.coredata.config.CoreDataJpaAutoConfiguration
 rubit.coredata.config.JpaAuditingAutoConfiguration
