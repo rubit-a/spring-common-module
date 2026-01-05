@@ -10,16 +10,22 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 JPA 인�
 
 ## 제공 구성요소
 
-### 1. BaseEntity / BaseTimeEntity
+### 1. BaseEntity / BaseTimeEntity / BaseAuditEntity
 
 - `BaseTimeEntity` : `createdAt`, `updatedAt`
 - `BaseEntity` : `id`, `version` + `BaseTimeEntity` 상속
+- `BaseAuditEntity` : `createdBy`, `updatedBy` + `BaseEntity` 상속
 
 ```kotlin
 @Entity
 class SampleEntity(
     var name: String
 ) : BaseEntity()
+
+@Entity
+class AuditedEntity(
+    var name: String
+) : BaseAuditEntity()
 ```
 
 ### 2. JPA Auditing
@@ -48,4 +54,5 @@ core:
 ## 참고
 
 - `AuditorAware`를 등록하지 않으면 기본 구현이 `Optional.empty()`를 반환합니다.
+- `createdBy`/`updatedBy`는 `AuditorAware` 구현이 값을 제공해야 채워집니다.
 - `BaseEntity`의 `version` 필드는 낙관적 락(optimistic locking)에 사용됩니다.
