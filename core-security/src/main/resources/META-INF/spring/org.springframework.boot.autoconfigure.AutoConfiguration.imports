@@ -1,3 +1,5 @@
 rubit.coresecurity.config.AuthAutoConfiguration
 rubit.coresecurity.config.JwtAutoConfiguration
 rubit.coresecurity.config.SessionAutoConfiguration
+rubit.coresecurity.config.PasswordEncoderAutoConfiguration
+rubit.coresecurity.config.SecurityWebAutoConfiguration

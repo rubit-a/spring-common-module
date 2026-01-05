@@ -9,6 +9,9 @@
 - Spring Security와 통합된 JWT 인증 필터
 - Auto Configuration을 통한 자동 설정
 - 인증 모드 선택 지원 (`jwt` 또는 `session`)
+- `@CurrentUser`로 인증 사용자 주입
+- SecurityContext 헬퍼 유틸 제공
+- 기본 `PasswordEncoder` 제공 (BCrypt)
 
 ## 사용 방법
 
@@ -31,6 +34,9 @@ dependencies {
 ```yaml
 auth:
   mode: jwt
+  password-encoder:
+    enabled: true
+    strength: 10
 
 jwt:
   secret-key: your-secret-key-here-minimum-256-bits-long
@@ -43,6 +49,8 @@ jwt:
 
 ```properties
 auth.mode=jwt
+auth.password-encoder.enabled=true
+auth.password-encoder.strength=10
 jwt.secret-key=your-secret-key-here-minimum-256-bits-long
 jwt.access-token-expiration=3600000
 jwt.refresh-token-expiration=604800000
@@ -65,7 +73,44 @@ Session 모드는 기본적으로 `SessionCreationPolicy.IF_REQUIRED`를 사용�
 필요한 인증/인가 정책은 애플리케이션에서 `SecurityFilterChain`을 정의해 주세요.
 `auth.mode=session`일 때는 JWT 자동 설정이 비활성화됩니다.
 
-### 3. JWT 토큰 사용
+#### PasswordEncoder
+
+별도 설정이 없으면 `BCryptPasswordEncoder`가 자동 등록됩니다.
+
+```yaml
+auth:
+  password-encoder:
+    enabled: true
+    strength: 10
+```
+
+### 3. @CurrentUser 사용
+
+컨트롤러 파라미터에 `@CurrentUser`를 붙이면 인증 사용자 정보를 주입합니다.
+
+```kotlin
+@GetMapping("/me")
+fun me(@CurrentUser username: String?): Map<String, String?> {
+    return mapOf("username" to username)
+}
+```
+
+지원 타입:
+
+- `String` (username)
+- `Authentication`
+- `Principal`
+- `UserDetails` (principal이 UserDetails인 경우)
+
+### 4. SecurityContextUtils
+
+```kotlin
+val username = SecurityContextUtils.getUsername()
+val authorities = SecurityContextUtils.getAuthorities()
+val isAuthenticated = SecurityContextUtils.isAuthenticated()
+```
+
+### 5. JWT 토큰 사용
 
 #### 3.1 토큰 생성
 
