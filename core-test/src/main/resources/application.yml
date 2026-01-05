@@ -29,3 +29,8 @@ core:
   logging:
     aop:
       enabled: true
+  data:
+    jpa:
+      batch-size: 25
+      fetch-size: 50
+      time-zone: UTC

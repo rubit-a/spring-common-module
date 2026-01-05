@@ -1,9 +1,6 @@
 package rubit.coretest.coredata
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,14 +14,19 @@ import org.springframework.test.web.servlet.setup.DefaultMockMvcBuilder
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.web.context.WebApplicationContext
 import rubit.coretest.coreauth.dto.LoginRequest
-import rubit.coretest.coredata.controller.SampleCreateRequest
-import rubit.coretest.coredata.controller.SampleUpdateRequest
-import tools.jackson.databind.JsonNode
 import tools.jackson.databind.ObjectMapper
 
-@SpringBootTest
-@DisplayName("core-data 통합 테스트")
-class CoreDataIntegrationTest {
+@SpringBootTest(
+    properties = [
+        "core.data.jpa.physical-naming-strategy=org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy",
+        "core.data.jpa.implicit-naming-strategy=org.springframework.boot.hibernate.SpringImplicitNamingStrategy",
+        "core.data.jpa.batch-size=25",
+        "core.data.jpa.fetch-size=50",
+        "core.data.jpa.time-zone=UTC"
+    ]
+)
+@DisplayName("core-data JPA 설정 통합 테스트")
+class CoreDataJpaSettingsIntegrationTest {
 
     private lateinit var mockMvc: MockMvc
 
@@ -34,53 +36,42 @@ class CoreDataIntegrationTest {
     @Autowired
     private lateinit var objectMapper: ObjectMapper
 
-    @BeforeEach
-    fun setUp() {
+    @Test
+    @DisplayName("JPA 설정이 Hibernate 옵션으로 반영된다")
+    fun jpaSettingsAreApplied() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
             .apply<DefaultMockMvcBuilder>(springSecurity())
             .build()
-    }
 
-    @Test
-    @DisplayName("샘플 생성/수정 시 auditing 필드가 채워진다")
-    fun auditingFieldsArePopulated() {
         val accessToken = login("testuser", "password123")
 
-        val createPayload = objectMapper.writeValueAsString(SampleCreateRequest(name = "alpha"))
-        val createResult = mockMvc.perform(
-            MockMvcRequestBuilders.post("/api/data/samples")
+        val result = mockMvc.perform(
+            MockMvcRequestBuilders.get("/api/data/settings")
                 .header("Authorization", "Bearer $accessToken")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(createPayload)
+                .accept(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk)
             .andReturn()
 
-        val createdData = extractDataNode(createResult.response.contentAsString)
-        val sampleId = createdData.path("id").asLong()
-        assertTrue(sampleId > 0)
-        assertEquals("alpha", createdData.path("name").asString())
-        assertEquals("testuser", createdData.path("createdBy").asString())
-        assertEquals("testuser", createdData.path("updatedBy").asString())
-        assertFalse(createdData.path("createdAt").isNull)
-        assertFalse(createdData.path("updatedAt").isNull)
+        val data = extractDataNode(result.response.contentAsString)
 
-        val updatePayload = objectMapper.writeValueAsString(SampleUpdateRequest(name = "beta"))
-        val updateResult = mockMvc.perform(
-            MockMvcRequestBuilders.patch("/api/data/samples/$sampleId")
-                .header("Authorization", "Bearer $accessToken")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(updatePayload)
+        assertEquals(
+            "org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy",
+            data.path("physicalNamingStrategy").asString()
         )
-            .andExpect(status().isOk)
-            .andReturn()
-
-        val updatedData = extractDataNode(updateResult.response.contentAsString)
-        assertEquals(sampleId, updatedData.path("id").asLong())
-        assertEquals("beta", updatedData.path("name").asString())
-        assertEquals("testuser", updatedData.path("createdBy").asString())
-        assertEquals("testuser", updatedData.path("updatedBy").asString())
-        assertFalse(updatedData.path("updatedAt").isNull)
+        assertEquals(
+            "org.springframework.boot.hibernate.SpringImplicitNamingStrategy",
+            data.path("implicitNamingStrategy").asString()
+        )
+        assertEquals(25, data.path("configuredBatchSize").asInt())
+        assertEquals(50, data.path("configuredFetchSize").asInt())
+        assertEquals("UTC", data.path("configuredTimeZone").asString())
+        assertEquals(25, data.path("hibernateJdbcBatchSize").asInt())
+        assertEquals(50, data.path("hibernateJdbcFetchSize").asInt())
+        assertEquals("UTC", data.path("hibernateJdbcTimeZone").asString())
+        assertEquals(25, data.path("jdbcBatchSize").asInt())
+        assertEquals(50, data.path("jdbcFetchSize").asInt())
+        assertEquals("UTC", data.path("jdbcTimeZone").asString())
     }
 
     private fun login(username: String, password: String): String {
@@ -100,7 +91,7 @@ class CoreDataIntegrationTest {
         return tokenNode.asString()
     }
 
-    private fun extractDataNode(content: String): JsonNode {
+    private fun extractDataNode(content: String): tools.jackson.databind.JsonNode {
         val root = objectMapper.readTree(content)
         val dataNode = root.path("data")
         return if (dataNode.isMissingNode || dataNode.isNull) root else dataNode

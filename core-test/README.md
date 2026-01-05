@@ -87,6 +87,7 @@ core-test/
 - `POST /api/data/samples` - 샘플 생성
 - `GET /api/data/samples` - 샘플 목록
 - `PATCH /api/data/samples/{id}` - 샘플 수정
+- `GET /api/data/settings` - JPA 설정 확인
 
 ## 실행 방법
 
