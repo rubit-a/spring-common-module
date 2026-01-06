@@ -77,6 +77,44 @@ class CoreSecuritySessionIntegrationTest {
             .andExpect(MockMvcResultMatchers.status().isForbidden)
     }
 
+    @Test
+    @DisplayName("@CurrentUser와 SecurityContextUtils로 사용자 정보를 반환한다")
+    fun currentUserResolverAndContextUtils() {
+        val session = login("testuser", "password123")
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/api/users/current")
+                .session(session)
+        )
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("testuser"))
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/api/users/current-auth")
+                .session(session)
+        )
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("testuser"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.authorities[0]").value("ROLE_USER"))
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/api/users/current-details")
+                .session(session)
+        )
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("testuser"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.authorities[0]").value("ROLE_USER"))
+
+        mockMvc.perform(
+            MockMvcRequestBuilders.get("/api/users/context")
+                .session(session)
+        )
+            .andExpect(MockMvcResultMatchers.status().isOk)
+            .andExpect(MockMvcResultMatchers.jsonPath("$.username").value("testuser"))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.authenticated").value(true))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.authorities[0]").value("ROLE_USER"))
+    }
+
     private fun login(username: String, password: String): MockHttpSession {
         val payload = objectMapper.writeValueAsString(LoginRequest(username, password))
 
