@@ -30,3 +30,7 @@ Thumbs.db
 
 # Local env wrappers
 scripts/gradle-with-env.sh
+
+# Project-specific Gradle user home
+.gradle-user-home/
+/.gradle-user-home/

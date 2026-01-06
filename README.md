@@ -224,6 +224,8 @@ export GITHUB_ACTOR=your-github-username
 export GITHUB_TOKEN=your-github-token
 ```
 
+> `gradle.properties`에는 `githubRepository`, `gpr.user`, `gpr.key` 키만 사용하며, `GITHUB_*`는 환경 변수로만 인식됩니다.
+
 > PAT 권한: `read:packages`, `write:packages`
 
 ### 1-1. 안전한 인증 설정 (권장)
@@ -244,6 +246,62 @@ gpr.key=your-github-token
   - 예: `./scripts/gradle-with-env.sh :core-security:publish`
 
 > `gpr.key`는 `read:packages` 권한이 필요하고, publish 시 `write:packages` 권한이 필요합니다.
+
+### 1-2. 래퍼 스크립트 사용 방법
+
+`scripts/gradle-with-env.sh`는 GitHub Packages용 환경변수를 설정한 뒤
+전달받은 Gradle 작업을 실행하는 래퍼입니다.
+
+1) 스크립트 내부 값 수정
+```
+GITHUB_REPOSITORY=OWNER/REPO
+GITHUB_ACTOR=your-github-username
+GITHUB_TOKEN=your-github-token
+```
+
+2) 실행 예시
+```
+./scripts/gradle-with-env.sh build
+./scripts/gradle-with-env.sh :core-test:classes
+./scripts/gradle-with-env.sh :core-security:publish
+```
+
+> 이미 환경변수를 export한 경우, 스크립트 값 대신 기존 환경변수가 사용됩니다.
+
+### 1-3. IntelliJ Gradle Run Configuration에 환경변수 설정 (방법 B)
+
+IntelliJ에서 Gradle 작업을 실행할 때 환경변수를 직접 주입하는 방법입니다.
+
+1) `Run` → `Edit Configurations...`  
+2) `+` → `Gradle` 선택  
+3) `Tasks`에 `build` 또는 필요한 Gradle task 입력  
+4) `Environment variables`에 아래 값 추가  
+
+```
+GITHUB_REPOSITORY=OWNER/REPO
+GITHUB_ACTOR=your-github-username
+GITHUB_TOKEN=your-github-token
+```
+
+> `GITHUB_REPOSITORY`는 반드시 `OWNER/REPO` 형식이어야 합니다.
+
+### 1-4. 프로젝트 전용 Gradle user home 사용 (권장)
+
+IntelliJ에서 Gradle 의존성 해석에 필요한 인증을 **해당 프로젝트에만** 적용하는 방법입니다.
+
+1) IntelliJ → `Preferences` → `Build Tools` → `Gradle`  
+2) `Gradle user home`을 프로젝트 내부 경로로 설정  
+   - 예: `spring-common-module/.gradle-user-home`  
+3) 아래 파일 생성  
+   - `spring-common-module/.gradle-user-home/gradle.properties`
+
+```
+gpr.user=your-github-username
+gpr.key=your-github-token
+```
+
+4) `spring-common-module/gradle.properties`에는 `githubRepository=OWNER/REPO`만 유지  
+5) Gradle Refresh 후 다시 실행
 
 ### 2. 모듈 배포
 
