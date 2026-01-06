@@ -27,7 +27,7 @@
 - 포함 예시
   - 역할/권한 상수, 인증 컨텍스트 헬퍼
   - 보안 헤더, IP allow/deny, rate limiting
-- 참고: 인증 모듈은 `core-security`로 별도 유지
+- 참고: OAuth2 로그인/Provider 연동은 의존성이 크므로 `core-security-oauth2`로 분리 권장
 
 ### 선택 묶음 (의존성 크고 서비스별 선택 사항)
 #### core-http

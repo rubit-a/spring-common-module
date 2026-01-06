@@ -9,6 +9,7 @@ spring-common-module/
 ├── core-data/              # 공통 데이터/JPA 인프라 모듈
 ├── core-logging/           # 공통 로깅 유틸 모듈
 ├── core-security/          # 인증 공통 라이브러리 (JWT/Session)
+├── core-security-oauth2/   # OAuth2 로그인 + 자체 JWT 발급
 ├── core-web/               # 공통 Web 유틸 모듈
 └── core-test/               # core-security 사용 예제 프로젝트
 ```
@@ -28,25 +29,31 @@ spring-common-module/
 
 **자세한 내용:** [core-security/README.md](core-security/README.md)
 
-### 2. core-web
+### 2. core-security-oauth2
+
+OAuth2 로그인 후 자체 JWT를 발급하는 공통 모듈입니다.
+
+**자세한 내용:** [core-security-oauth2/README.md](core-security-oauth2/README.md)
+
+### 3. core-web
 
 Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 Web 관련 유틸 모듈입니다.
 
 **자세한 내용:** [core-web/README.md](core-web/README.md)
 
-### 3. core-logging
+### 4. core-logging
 
 Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 로깅 유틸 모듈입니다.
 
 **자세한 내용:** [core-logging/README.md](core-logging/README.md)
 
-### 4. core-data
+### 5. core-data
 
 Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 DB/JPA 인프라 모듈입니다.
 
 **자세한 내용:** [core-data/README.md](core-data/README.md)
 
-### 5. core-test
+### 6. core-test
 
 `core-security` 모듈을 활용하는 실제 웹 애플리케이션 예제입니다.
 
@@ -65,6 +72,7 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 DB/JPA �
 ```bash
 cd spring-common-module
 ./core-security/gradlew build
+./gradlew :core-security-oauth2:build
 ./gradlew :core-data:build
 ./gradlew :core-logging:build
 ./gradlew :core-web:build
@@ -104,6 +112,7 @@ curl http://localhost:8080/api/users/me \
 rootProject.name = "spring-common-module"
 
 include("core-security")
+include("core-security-oauth2")
 include("core-logging")
 include("core-web")
 include("core-data")
@@ -228,6 +237,7 @@ nexusPassword=비밀번호
 ```bash
 ./gradlew :core-logging:publish
 ./gradlew :core-security:publish
+./gradlew :core-security-oauth2:publish
 ./gradlew :core-data:publish
 ./gradlew :core-web:publish
 ```
@@ -253,6 +263,7 @@ repositories {
 dependencies {
     implementation("rubit:core-logging:0.0.1-SNAPSHOT")
     implementation("rubit:core-security:0.0.1-SNAPSHOT")
+    implementation("rubit:core-security-oauth2:0.0.1-SNAPSHOT")
     implementation("rubit:core-data:0.0.1-SNAPSHOT")
     implementation("rubit:core-web:0.0.1-SNAPSHOT")
 }
@@ -321,6 +332,7 @@ refreshSnapshots=true
 
 # 특정 모듈만 빌드
 ./core-security/gradlew :core-security:build
+./gradlew :core-security-oauth2:build
 ./gradlew :core-data:build
 ./gradlew :core-logging:build
 ./gradlew :core-web:build
