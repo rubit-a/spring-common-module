@@ -27,3 +27,6 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Local env wrappers
+scripts/gradle-with-env.sh

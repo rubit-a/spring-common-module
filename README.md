@@ -202,37 +202,50 @@ class SecurityConfig {
 }
 ```
 
-## Nexus 배포 및 의존 설정
+## GitHub Packages 배포 및 의존 설정
 
-로컬 Nexus(기본 `http://localhost:8081`)를 통해 공통 모듈을 배포하고 의존합니다.
+GitHub Packages Maven registry를 통해 공통 모듈을 배포하고 의존합니다.
 
-### 1. Nexus 실행
+### 1. 저장소/인증 정보 설정
 
-```bash
-cd ../nexus-repo
-docker-compose up -d
-```
+`gradle.properties` 또는 환경 변수로 설정합니다.
 
-관리자 비밀번호 확인:
-```bash
-docker exec -it nexus-repo cat /nexus-data/admin.password
-```
-
-### 2. 인증 정보 설정
-
-환경 변수로 설정:
-```bash
-export NEXUS_USERNAME=admin
-export NEXUS_PASSWORD=비밀번호
-```
-
-또는 `gradle.properties`에 설정:
+`gradle.properties`:
 ```properties
-nexusUsername=admin
-nexusPassword=비밀번호
+githubRepository=OWNER/REPO
+gpr.user=your-github-username
+gpr.key=your-github-token
 ```
 
-### 3. 모듈 배포
+환경 변수:
+```bash
+export GITHUB_REPOSITORY=OWNER/REPO
+export GITHUB_ACTOR=your-github-username
+export GITHUB_TOKEN=your-github-token
+```
+
+> PAT 권한: `read:packages`, `write:packages`
+
+### 1-1. 안전한 인증 설정 (권장)
+
+토큰은 **프로젝트 파일에 하드코딩하지 말고** 아래 방식으로 관리하세요.
+
+- 로컬: `~/.gradle/gradle.properties`
+```properties
+githubRepository=OWNER/REPO
+gpr.user=your-github-username
+gpr.key=your-github-token
+```
+
+- CI(GitHub Actions): `GITHUB_TOKEN`, `GITHUB_ACTOR` 자동 사용
+
+- 로컬 래퍼 스크립트(환경변수만 사용)
+  - `scripts/gradle-with-env.sh`에 값을 입력한 뒤 사용
+  - 예: `./scripts/gradle-with-env.sh :core-security:publish`
+
+> `gpr.key`는 `read:packages` 권한이 필요하고, publish 시 `write:packages` 권한이 필요합니다.
+
+### 2. 모듈 배포
 
 ```bash
 ./gradlew :core-logging:publish
@@ -242,7 +255,7 @@ nexusPassword=비밀번호
 ./gradlew :core-web:publish
 ```
 
-### 4. core-test 실행 (Nexus 의존)
+### 3. core-test 실행 (GitHub Packages 의존)
 
 ```bash
 ./gradlew :core-test:bootRun
@@ -253,11 +266,17 @@ nexusPassword=비밀번호
 ./gradlew :core-test:bootRun -PuseLocalModules=true
 ```
 
-### 5. 외부 프로젝트에서 사용
+### 4. 외부 프로젝트에서 사용
 
 ```kotlin
 repositories {
-    maven { url = uri("http://localhost:8081/repository/maven-public/") }
+    maven {
+        url = uri("https://maven.pkg.github.com/OWNER/REPO")
+        credentials {
+            username = providers.gradleProperty("gpr.user").orNull ?: System.getenv("GITHUB_ACTOR")
+            password = providers.gradleProperty("gpr.key").orNull ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
 }
 
 dependencies {
@@ -269,28 +288,26 @@ dependencies {
 }
 ```
 
-> 저장소 주소를 변경하려면 `nexusBaseUrl`, `nexusPublicUrl`, `nexusReleasesUrl`, `nexusSnapshotsUrl` Gradle 속성을 사용하세요.
+> 저장소 주소를 직접 지정하려면 `githubPackagesUrl` Gradle 속성을 사용하세요.
 
-### Nexus 경로 변경 시 설정
+### GitHub Packages 주소 변경 시 설정
 
-Nexus 주소나 repository 이름이 변경된 경우, `gradle.properties`에서 덮어쓰면 됩니다.
+GitHub repository가 변경된 경우, `gradle.properties`에서 덮어쓰면 됩니다.
 
-호스트/포트만 변경:
+Repository 지정:
 ```properties
-nexusBaseUrl=http://새주소:8082
+githubRepository=OWNER/REPO
 ```
 
-repository 이름까지 변경:
+URL 직접 지정:
 ```properties
-nexusPublicUrl=http://새주소:8082/repository/custom-public/
-nexusSnapshotsUrl=http://새주소:8082/repository/custom-snapshots/
-nexusReleasesUrl=http://새주소:8082/repository/custom-releases/
+githubPackagesUrl=https://maven.pkg.github.com/OWNER/REPO
 ```
 
 인증 정보 변경:
 ```properties
-nexusUsername=사용자
-nexusPassword=비밀번호
+gpr.user=사용자
+gpr.key=토큰
 ```
 
 ### build 시 자동 배포/의존성 갱신

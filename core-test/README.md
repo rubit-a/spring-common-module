@@ -392,7 +392,7 @@ jwt:
 
 ```kotlin
 dependencies {
-    // 공통 모듈 (Nexus)
+    // 공통 모듈 (GitHub Packages)
     implementation("rubit:core-security:0.0.1-SNAPSHOT")
 
     // Spring Boot
