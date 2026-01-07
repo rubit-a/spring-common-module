@@ -26,6 +26,10 @@ core:
   web:
     response:
       enabled: true
+  excel:
+    download:
+      enabled: true
+      path: /api/excel
   logging:
     aop:
       enabled: true

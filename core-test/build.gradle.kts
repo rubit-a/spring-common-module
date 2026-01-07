@@ -23,11 +23,13 @@ dependencies {
     // Common Auth Module
     if (useLocalModules) {
         implementation(project(":core-data"))
+        implementation(project(":core-excel"))
         implementation(project(":core-logging"))
         implementation(project(":core-security"))
         implementation(project(":core-web"))
     } else {
         implementation("rubit:core-data:$commonModuleVersion")
+        implementation("rubit:core-excel:$commonModuleVersion")
         implementation("rubit:core-logging:$commonModuleVersion")
         implementation("rubit:core-security:$commonModuleVersion")
         implementation("rubit:core-web:$commonModuleVersion")

@@ -7,6 +7,7 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 모듈 �
 ```
 spring-common-module/
 ├── core-data/              # 공통 데이터/JPA 인프라 모듈
+├── core-excel/             # 공통 Excel 처리 모듈
 ├── core-logging/           # 공통 로깅 유틸 모듈
 ├── core-security/          # 인증 공통 라이브러리 (JWT/Session)
 ├── core-security-oauth2/   # OAuth2 로그인 + 자체 JWT 발급
@@ -53,7 +54,13 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 DB/JPA �
 
 **자세한 내용:** [core-data/README.md](core-data/README.md)
 
-### 6. core-test
+### 6. core-excel
+
+Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 Excel 처리 모듈입니다.
+
+**자세한 내용:** [core-excel/README.md](core-excel/README.md)
+
+### 7. core-test
 
 `core-security` 모듈을 활용하는 실제 웹 애플리케이션 예제입니다.
 
@@ -74,6 +81,7 @@ cd spring-common-module
 ./core-security/gradlew build
 ./gradlew :core-security-oauth2:build
 ./gradlew :core-data:build
+./gradlew :core-excel:build
 ./gradlew :core-logging:build
 ./gradlew :core-web:build
 ```
@@ -113,9 +121,10 @@ rootProject.name = "spring-common-module"
 
 include("core-security")
 include("core-security-oauth2")
-include("core-logging")
 include("core-web")
+include("core-logging")
 include("core-data")
+include("core-excel")
 include("core-test")
 ```
 
@@ -310,6 +319,7 @@ gpr.key=your-github-token
 ./gradlew :core-security:publish
 ./gradlew :core-security-oauth2:publish
 ./gradlew :core-data:publish
+./gradlew :core-excel:publish
 ./gradlew :core-web:publish
 ```
 
@@ -342,6 +352,7 @@ dependencies {
     implementation("rubit:core-security:0.0.1-SNAPSHOT")
     implementation("rubit:core-security-oauth2:0.0.1-SNAPSHOT")
     implementation("rubit:core-data:0.0.1-SNAPSHOT")
+    implementation("rubit:core-excel:0.0.1-SNAPSHOT")
     implementation("rubit:core-web:0.0.1-SNAPSHOT")
 }
 ```
@@ -409,6 +420,7 @@ refreshSnapshots=true
 ./core-security/gradlew :core-security:build
 ./gradlew :core-security-oauth2:build
 ./gradlew :core-data:build
+./gradlew :core-excel:build
 ./gradlew :core-logging:build
 ./gradlew :core-web:build
 ./core-security/gradlew :core-test:build

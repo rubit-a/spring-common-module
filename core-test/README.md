@@ -59,6 +59,16 @@ core-test/
 - `coredata/entity/SampleEntity.kt` - BaseAuditEntity 사용 예제
 - `coredata/controller/SampleController.kt` - 샘플 CRUD API
 
+### 3. core-excel (엑셀 생성/다운로드)
+
+**주요 기능:**
+- 템플릿/데이터 공급자 기반 엑셀 생성
+- 다운로드 엔드포인트 제공
+
+**관련 파일:**
+- `coreexcel/UserExcelTemplate.kt` - 엑셀 템플릿 정의
+- `coreexcel/UserExcelDataProvider.kt` - 데이터 공급자
+
 ## API 엔드포인트
 
 ### core-security 모듈 테스트 API
@@ -88,6 +98,11 @@ core-test/
 - `GET /api/data/samples` - 샘플 목록
 - `PATCH /api/data/samples/{id}` - 샘플 수정
 - `GET /api/data/settings` - JPA 설정 확인
+
+### core-excel 모듈 테스트 API (인증 필요)
+
+- `GET /api/excel/users` - 사용자 목록 엑셀 다운로드
+- `GET /api/excel/users?enabled=true` - 활성 사용자 엑셀 다운로드
 
 ## 실행 방법
 
