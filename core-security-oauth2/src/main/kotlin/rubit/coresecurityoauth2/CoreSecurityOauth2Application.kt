@@ -1,6 +1,0 @@
-package rubit.coresecurityoauth2
-
-import org.springframework.boot.autoconfigure.SpringBootApplication
-
-@SpringBootApplication
-class CoreSecurityOauth2Application
