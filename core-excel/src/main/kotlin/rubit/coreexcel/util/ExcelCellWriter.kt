@@ -46,7 +46,7 @@ class ExcelCellWriter(
                 }
             }
             is LocalTime -> {
-                cell.setCellValue(value)
+                cell.setCellValue(value.atDate(LocalDate.of(1899, 12, 31)))
                 if (resolvedStyle == null) {
                     resolvedStyle = styles.time
                 }

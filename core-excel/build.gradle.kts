@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "2.2.21"
     kotlin("plugin.spring") version "2.2.21"
+    id("java-library")
     id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
 }
@@ -19,7 +20,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation(project(":core-web"))
-    implementation("org.apache.poi:poi-ooxml:5.4.0")
+    api("org.apache.poi:poi-ooxml:5.4.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")

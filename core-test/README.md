@@ -68,6 +68,8 @@ core-test/
 **관련 파일:**
 - `coreexcel/UserExcelTemplate.kt` - 엑셀 템플릿 정의
 - `coreexcel/UserExcelDataProvider.kt` - 데이터 공급자
+- `coreexcel/UserReportExcelTemplate.kt` - 리포트 템플릿(스타일/요약/필터 예제)
+- `coreexcel/UserReportExcelDataProvider.kt` - 리포트 데이터 공급자
 
 ## API 엔드포인트
 
@@ -101,8 +103,9 @@ core-test/
 
 ### core-excel 모듈 테스트 API (인증 필요)
 
-- `GET /api/excel/users` - 사용자 목록 엑셀 다운로드
-- `GET /api/excel/users?enabled=true` - 활성 사용자 엑셀 다운로드
+- `GET /api/test/excel/users` - 사용자 목록 엑셀 다운로드
+- `GET /api/test/excel/users?enabled=true` - 활성 사용자 엑셀 다운로드
+- `GET /api/test/excel/users-report` - 요약/스타일 리포트 엑셀 다운로드
 
 ## 실행 방법
 

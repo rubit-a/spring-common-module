@@ -7,6 +7,11 @@ class ExcelTemplateRenderer(
 ) {
     fun <T : Any> render(template: ExcelTemplate<T>, data: Iterable<T>): ByteArray {
         val builder = workbookBuilderFactory.create()
+        if (template is ExcelTemplateCustomizer<*>) {
+            @Suppress("UNCHECKED_CAST")
+            (template as ExcelTemplateCustomizer<T>).render(builder, data)
+            return builder.toByteArray()
+        }
         builder.sheet(template.sheetName) {
             val headers = template.headers()
             if (headers.isNotEmpty()) {
