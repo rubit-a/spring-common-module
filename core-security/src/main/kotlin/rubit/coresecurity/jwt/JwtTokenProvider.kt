@@ -106,7 +106,7 @@ class JwtTokenProvider(
 
         val builder = Jwts.parser()
             .verifyWith(secretKey)
-            .setAllowedClockSkewSeconds(properties.clockSkewSeconds)
+            .clockSkewSeconds(properties.clockSkewSeconds)
 
         if (properties.issuer.isNotBlank()) {
             builder.requireIssuer(properties.issuer)
