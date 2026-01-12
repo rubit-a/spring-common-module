@@ -80,6 +80,7 @@ core-test/
 - `POST /api/auth/login` - 로그인 (JWT 토큰 발급)
 - `GET /api/auth/validate` - 토큰 유효성 검증
 - `GET /api/auth/user-info` - 토큰에서 사용자 정보 추출
+- `GET /api/auth/config` - JWT 설정 확인
 - `GET /api/public/hello` - 공개 엔드포인트
 - `GET /api/public/health` - 헬스 체크
 
@@ -130,7 +131,7 @@ cd core-test
 
 또는 JAR 파일 직접 실행:
 ```bash
-java -jar core-test/build/libs/core-test-0.0.1-SNAPSHOT.jar
+java -jar core-test/build/libs/core-test-1.0.0.jar
 ```
 
 애플리케이션이 `http://localhost:8080`에서 실행됩니다.
@@ -404,6 +405,9 @@ jwt:
   access-token-expiration: 3600000  # 1시간
   refresh-token-expiration: 604800000  # 7일
   issuer: core-test
+  audience: core-test-api
+  clock-skew-seconds: 0
+  secret-key-format: RAW
 ```
 
 ## 의존성
@@ -411,7 +415,11 @@ jwt:
 ```kotlin
 dependencies {
     // 공통 모듈 (GitHub Packages)
-    implementation("rubit:core-security:0.0.1-SNAPSHOT")
+    implementation("rubit:core-data:1.0.0")
+    implementation("rubit:core-excel:1.0.0")
+    implementation("rubit:core-logging:1.0.0")
+    implementation("rubit:core-security:1.0.0")
+    implementation("rubit:core-web:1.0.0")
 
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -421,8 +429,6 @@ dependencies {
 }
 ```
 
-로컬 모듈을 직접 참조하려면 `-PuseLocalModules=true` 옵션으로 실행하세요.
-
 ## 새로운 공통 모듈 추가하기
 
 새로운 공통 모듈을 테스트하려면:
@@ -430,8 +436,8 @@ dependencies {
 1. **의존성 추가** (`build.gradle.kts`):
 ```kotlin
 dependencies {
-    implementation("rubit:core-security:0.0.1-SNAPSHOT")
-    implementation("rubit:새로운-모듈:0.0.1-SNAPSHOT")  // 추가
+    implementation("rubit:core-security:1.0.0")
+    implementation("rubit:새로운-모듈:1.0.0")  // 추가
 }
 ```
 

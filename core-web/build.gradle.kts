@@ -6,7 +6,8 @@ plugins {
 }
 
 group = "rubit"
-version = "0.0.1-SNAPSHOT"
+version = (rootProject.findProperty("coreWebVersion") as String?)
+    ?: "1.0.0"
 description = "core-web"
 
 java {

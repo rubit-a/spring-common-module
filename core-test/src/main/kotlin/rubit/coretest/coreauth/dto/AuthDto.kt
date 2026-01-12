@@ -15,3 +15,10 @@ data class UserInfoResponse(
     val username: String,
     val authorities: List<String>
 )
+
+data class JwtConfigResponse(
+    val issuer: String,
+    val audience: String?,
+    val clockSkewSeconds: Long,
+    val secretKeyFormat: String
+)

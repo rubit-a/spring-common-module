@@ -23,7 +23,7 @@
 dependencies {
     implementation(project(":core-security"))
     // 또는 Maven 저장소에 배포한 경우
-    // implementation("rubit:core-security:0.0.1-SNAPSHOT")
+    // implementation("rubit:core-security:1.0.0")
 }
 ```
 

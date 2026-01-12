@@ -18,7 +18,7 @@ Spring Security OAuth2 로그인 후 자체 JWT를 발급하는 공통 모듈입
 dependencies {
     implementation(project(":core-security-oauth2"))
     // 또는 Maven 저장소에 배포한 경우
-    // implementation("rubit:core-security-oauth2:0.0.1-SNAPSHOT")
+    // implementation("rubit:core-security-oauth2:1.0.0")
 }
 ```
 

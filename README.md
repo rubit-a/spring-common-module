@@ -130,12 +130,12 @@ include("core-test")
 
 ### 모듈 간 의존성
 
-`core-test`은 `core-security`를 의존성으로 사용합니다:
+`core-test`는 공통 모듈을 원격 아티팩트로 의존합니다:
 
 ```kotlin
 // core-test/build.gradle.kts
 dependencies {
-    implementation(project(":core-security"))
+    implementation("rubit:core-security:1.0.0")
     // ...
 }
 ```
@@ -154,7 +154,7 @@ dependencies {
 Maven 저장소에 배포한 경우:
 ```kotlin
 dependencies {
-    implementation("rubit:core-security:0.0.1-SNAPSHOT")
+    implementation("rubit:core-security:1.0.0")
 }
 ```
 
@@ -332,11 +332,6 @@ gpr.key=your-github-token
 ./gradlew :core-test:bootRun
 ```
 
-로컬 모듈을 직접 참조하려면:
-```bash
-./gradlew :core-test:bootRun -PuseLocalModules=true
-```
-
 ### 4. 외부 프로젝트에서 사용
 
 ```kotlin
@@ -351,12 +346,12 @@ repositories {
 }
 
 dependencies {
-    implementation("rubit:core-logging:0.0.1-SNAPSHOT")
-    implementation("rubit:core-security:0.0.1-SNAPSHOT")
-    implementation("rubit:core-security-oauth2:0.0.1-SNAPSHOT")
-    implementation("rubit:core-data:0.0.1-SNAPSHOT")
-    implementation("rubit:core-excel:0.0.1-SNAPSHOT")
-    implementation("rubit:core-web:0.0.1-SNAPSHOT")
+    implementation("rubit:core-logging:1.0.0")
+    implementation("rubit:core-security:1.0.0")
+    implementation("rubit:core-security-oauth2:1.0.0")
+    implementation("rubit:core-data:1.0.0")
+    implementation("rubit:core-excel:1.0.0")
+    implementation("rubit:core-web:1.0.0")
 }
 ```
 

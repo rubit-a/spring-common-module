@@ -21,6 +21,9 @@ jwt:
   access-token-expiration: 3600000  # 1 hour
   refresh-token-expiration: 604800000  # 7 days
   issuer: core-test
+  audience: core-test-api
+  clock-skew-seconds: 0
+  secret-key-format: RAW
 
 core:
   web:

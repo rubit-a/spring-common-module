@@ -7,7 +7,8 @@ plugins {
 }
 
 group = "rubit"
-version = "0.0.1-SNAPSHOT"
+version = (rootProject.findProperty("coreExcelVersion") as String?)
+    ?: "1.0.0"
 description = "core-excel"
 
 java {
@@ -16,10 +17,13 @@ java {
     }
 }
 
+val coreWebVersion = (rootProject.findProperty("coreWebVersion") as String?)
+    ?: rootProject.version.toString()
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation(project(":core-web"))
+    implementation("rubit:core-web:$coreWebVersion")
     api("org.apache.poi:poi-ooxml:5.4.0")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 

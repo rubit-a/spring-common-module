@@ -6,7 +6,8 @@ plugins {
 }
 
 group = "rubit"
-version = "0.0.1-SNAPSHOT"
+version = (rootProject.findProperty("coreSecurityOauth2Version") as String?)
+    ?: "1.0.0"
 description = "core-security-oauth2"
 
 java {
@@ -15,8 +16,11 @@ java {
     }
 }
 
+val coreSecurityVersion = (rootProject.findProperty("coreSecurityVersion") as String?)
+    ?: rootProject.version.toString()
+
 dependencies {
-    implementation(project(":core-security"))
+    implementation("rubit:core-security:$coreSecurityVersion")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")

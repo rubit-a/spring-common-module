@@ -4,7 +4,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.web.bind.annotation.*
+import rubit.coresecurity.config.JwtProperties
 import rubit.coresecurity.jwt.JwtTokenProvider
+import rubit.coretest.coreauth.dto.JwtConfigResponse
 import rubit.coretest.coreauth.dto.LoginRequest
 import rubit.coretest.coreauth.dto.TokenResponse
 import rubit.coretest.coreauth.dto.UserInfoResponse
@@ -14,7 +16,8 @@ import rubit.coretest.coreauth.dto.UserInfoResponse
 @ConditionalOnProperty(prefix = "auth", name = ["mode"], havingValue = "jwt", matchIfMissing = true)
 class JwtAuthController(
     private val jwtTokenProvider: JwtTokenProvider,
-    private val authenticationManager: AuthenticationManager
+    private val authenticationManager: AuthenticationManager,
+    private val jwtProperties: JwtProperties
 ) {
 
     @PostMapping("/login")
@@ -48,6 +51,16 @@ class JwtAuthController(
         return UserInfoResponse(
             username = username,
             authorities = authorities
+        )
+    }
+
+    @GetMapping("/config")
+    fun getJwtConfig(): JwtConfigResponse {
+        return JwtConfigResponse(
+            issuer = jwtProperties.issuer,
+            audience = jwtProperties.audience,
+            clockSkewSeconds = jwtProperties.clockSkewSeconds,
+            secretKeyFormat = jwtProperties.secretKeyFormat.name
         )
     }
 }

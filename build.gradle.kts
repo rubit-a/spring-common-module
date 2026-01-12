@@ -49,7 +49,8 @@ fun org.gradle.api.artifacts.dsl.RepositoryHandler.githubPackages() {
 
 allprojects {
     group = "rubit"
-    version = "0.0.1-SNAPSHOT"
+    version = (rootProject.findProperty("coreCommonVersion") as String?)
+        ?: "1.0.0"
 
     repositories {
         mavenLocal()

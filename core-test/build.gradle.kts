@@ -7,7 +7,8 @@ plugins {
 }
 
 group = "rubit"
-version = "0.0.1-SNAPSHOT"
+version = (rootProject.findProperty("coreTestVersion") as String?)
+    ?: "1.0.0"
 description = "core-test"
 
 java {
@@ -16,24 +17,23 @@ java {
     }
 }
 
-val useLocalModules = (findProperty("useLocalModules") as String?)?.toBoolean() ?: false
-val commonModuleVersion = project.version.toString()
+val coreSecurityVersion = (rootProject.findProperty("coreSecurityVersion") as String?)
+    ?: rootProject.version.toString()
+val coreDataVersion = (rootProject.findProperty("coreDataVersion") as String?)
+    ?: rootProject.version.toString()
+val coreExcelVersion = (rootProject.findProperty("coreExcelVersion") as String?)
+    ?: rootProject.version.toString()
+val coreLoggingVersion = (rootProject.findProperty("coreLoggingVersion") as String?)
+    ?: rootProject.version.toString()
+val coreWebVersion = (rootProject.findProperty("coreWebVersion") as String?)
+    ?: rootProject.version.toString()
 
 dependencies {
-    // Common Auth Module
-    if (useLocalModules) {
-        implementation(project(":core-data"))
-        implementation(project(":core-excel"))
-        implementation(project(":core-logging"))
-        implementation(project(":core-security"))
-        implementation(project(":core-web"))
-    } else {
-        implementation("rubit:core-data:$commonModuleVersion")
-        implementation("rubit:core-excel:$commonModuleVersion")
-        implementation("rubit:core-logging:$commonModuleVersion")
-        implementation("rubit:core-security:$commonModuleVersion")
-        implementation("rubit:core-web:$commonModuleVersion")
-    }
+    implementation("rubit:core-data:$coreDataVersion")
+    implementation("rubit:core-excel:$coreExcelVersion")
+    implementation("rubit:core-logging:$coreLoggingVersion")
+    implementation("rubit:core-security:$coreSecurityVersion")
+    implementation("rubit:core-web:$coreWebVersion")
 
     // Spring Boot
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
