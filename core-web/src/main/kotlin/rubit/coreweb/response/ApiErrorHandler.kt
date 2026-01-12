@@ -1,6 +1,7 @@
 package rubit.coreweb.response
 
 import jakarta.validation.ConstraintViolationException
+import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatusCode
 import org.springframework.http.ResponseEntity
@@ -17,9 +18,11 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.NoHandlerFoundException
 import rubit.coreweb.validation.ConstraintPathNormalizer
+import org.slf4j.LoggerFactory
 
 @RestControllerAdvice
 class ApiErrorHandler {
+    private val logger = LoggerFactory.getLogger(ApiErrorHandler::class.java)
 
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValid(
@@ -134,8 +137,10 @@ class ApiErrorHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleException(
-        ex: Exception
+        ex: Exception,
+        request: HttpServletRequest
     ): ResponseEntity<ApiResponse<Nothing>> {
+        logger.error("Unhandled exception for {} {}", request.method, request.requestURI, ex)
         return errorResponse(ErrorCode.INTERNAL_ERROR)
     }
 
