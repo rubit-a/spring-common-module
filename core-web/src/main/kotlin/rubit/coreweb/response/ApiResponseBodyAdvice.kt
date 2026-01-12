@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageConverter
 import org.springframework.http.server.ServerHttpRequest
 import org.springframework.http.server.ServerHttpResponse
+import org.springframework.core.io.Resource
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice
 import rubit.coreweb.config.CoreWebProperties
@@ -32,11 +33,23 @@ class ApiResponseBodyAdvice(
         request: ServerHttpRequest,
         response: ServerHttpResponse
     ): Any? {
+        val path = request.uri.path
+        if (path.startsWith("/v3/api-docs") ||
+            path.startsWith("/swagger-ui") ||
+            path == "/swagger-ui.html"
+        ) {
+            return body
+        }
+
         if (body is ApiResponse<*>) {
             return body
         }
 
         if (body is ProblemDetail) {
+            return body
+        }
+
+        if (body is Resource) {
             return body
         }
 
