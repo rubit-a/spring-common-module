@@ -7,6 +7,7 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 모듈 �
 ```
 spring-common-module/
 ├── core-data/              # 공통 데이터/JPA 인프라 모듈
+├── core-docs/              # 공통 API 문서(OpenAPI) 모듈
 ├── core-excel/             # 공통 Excel 처리 모듈
 ├── core-logging/           # 공통 로깅 유틸 모듈
 ├── core-security/          # 인증 공통 라이브러리 (JWT/Session)
@@ -54,13 +55,19 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 DB/JPA �
 
 **자세한 내용:** [core-data/README.md](core-data/README.md)
 
-### 6. core-excel
+### 6. core-docs
+
+OpenAPI/Swagger 문서 구성을 위한 공통 모듈입니다.
+
+**자세한 내용:** [core-docs/README.md](core-docs/README.md)
+
+### 7. core-excel
 
 Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 Excel 처리 모듈입니다.
 
 **자세한 내용:** [core-excel/README.md](core-excel/README.md)
 
-### 7. core-test
+### 8. core-test
 
 `core-security` 모듈을 활용하는 실제 웹 애플리케이션 예제입니다.
 
@@ -80,6 +87,7 @@ Spring Boot 애플리케이션에서 공통으로 사용할 수 있는 Excel 처
 cd spring-common-module
 ./core-security/gradlew build
 ./gradlew :core-security-oauth2:build
+./gradlew :core-docs:build
 ./gradlew :core-data:build
 ./gradlew :core-excel:build
 ./gradlew :core-logging:build
@@ -121,6 +129,7 @@ rootProject.name = "spring-common-module"
 
 include("core-security")
 include("core-security-oauth2")
+include("core-docs")
 include("core-web")
 include("core-logging")
 include("core-data")
@@ -321,6 +330,7 @@ gpr.key=your-github-token
 ./gradlew :core-logging:publish
 ./gradlew :core-security:publish
 ./gradlew :core-security-oauth2:publish
+./gradlew :core-docs:publish
 ./gradlew :core-data:publish
 ./gradlew :core-excel:publish
 ./gradlew :core-web:publish
@@ -349,6 +359,7 @@ dependencies {
     implementation("rubit:core-logging:1.0.0")
     implementation("rubit:core-security:1.0.0")
     implementation("rubit:core-security-oauth2:1.0.0")
+    implementation("rubit:core-docs:1.0.0")
     implementation("rubit:core-data:1.0.0")
     implementation("rubit:core-excel:1.0.0")
     implementation("rubit:core-web:1.0.0")
@@ -410,6 +421,7 @@ refreshSnapshots=true
 ```bash
 # 전체 프로젝트 빌드
 ./core-security/gradlew build
+./gradlew :core-docs:build
 ./gradlew :core-data:build
 ./gradlew :core-logging:build
 ./gradlew :core-web:build
@@ -417,6 +429,7 @@ refreshSnapshots=true
 # 특정 모듈만 빌드
 ./core-security/gradlew :core-security:build
 ./gradlew :core-security-oauth2:build
+./gradlew :core-docs:build
 ./gradlew :core-data:build
 ./gradlew :core-excel:build
 ./gradlew :core-logging:build
