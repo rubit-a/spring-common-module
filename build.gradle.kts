@@ -32,6 +32,15 @@ val githubPackagesEnabled = !githubPackagesUrl.isNullOrBlank() &&
     !githubToken.isNullOrBlank()
 val autoPublish = (providers.gradleProperty("autoPublish").orNull ?: "true").toBoolean()
 val refreshSnapshots = (providers.gradleProperty("refreshSnapshots").orNull ?: "true").toBoolean()
+val localModuleSubstitutions = mapOf(
+    "rubit:core-security" to ":core-security",
+    "rubit:core-security-oauth2" to ":core-security-oauth2",
+    "rubit:core-web" to ":core-web",
+    "rubit:core-logging" to ":core-logging",
+    "rubit:core-data" to ":core-data",
+    "rubit:core-excel" to ":core-excel",
+    "rubit:core-test" to ":core-test"
+)
 
 fun org.gradle.api.artifacts.dsl.RepositoryHandler.githubPackages() {
     if (!githubPackagesEnabled) {
@@ -58,10 +67,18 @@ allprojects {
         githubPackages()
     }
 
-    if (refreshSnapshots) {
-        configurations.configureEach {
+    configurations.configureEach {
+        if (refreshSnapshots) {
             resolutionStrategy.cacheChangingModulesFor(0, "seconds")
             resolutionStrategy.cacheDynamicVersionsFor(0, "seconds")
+        }
+
+        resolutionStrategy.dependencySubstitution {
+            localModuleSubstitutions.forEach { (moduleId, projectPath) ->
+                if (rootProject.findProject(projectPath) != null) {
+                    substitute(module(moduleId)).using(project(projectPath))
+                }
+            }
         }
     }
 }
