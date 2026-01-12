@@ -27,12 +27,15 @@ val coreLoggingVersion = (rootProject.findProperty("coreLoggingVersion") as Stri
     ?: rootProject.version.toString()
 val coreWebVersion = (rootProject.findProperty("coreWebVersion") as String?)
     ?: rootProject.version.toString()
+val coreDocsVersion = (rootProject.findProperty("coreDocsVersion") as String?)
+    ?: rootProject.version.toString()
 
 dependencies {
     implementation("rubit:core-data:$coreDataVersion")
     implementation("rubit:core-excel:$coreExcelVersion")
     implementation("rubit:core-logging:$coreLoggingVersion")
     implementation("rubit:core-security:$coreSecurityVersion")
+    implementation("rubit:core-docs:$coreDocsVersion")
     implementation("rubit:core-web:$coreWebVersion")
 
     // Spring Boot

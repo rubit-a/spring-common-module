@@ -40,6 +40,22 @@ Springdoc 기본 엔드포인트:
 - Swagger UI: `/swagger-ui/index.html`
 - OpenAPI JSON: `/v3/api-docs`
 
+## 경로 변경
+
+기본 경로를 변경하려면 아래 설정을 추가하세요:
+
+```yaml
+springdoc:
+  api-docs:
+    path: /api/docs
+  swagger-ui:
+    path: /api/swagger-ui
+```
+
+예시 경로:
+- OpenAPI JSON: `/api/docs`
+- Swagger UI: `/api/swagger-ui`
+
 ## 빌드
 
 ```bash

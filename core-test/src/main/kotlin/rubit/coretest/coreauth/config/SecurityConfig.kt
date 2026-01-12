@@ -29,7 +29,13 @@ class SecurityConfig {
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/api/auth/**", "/api/public/**").permitAll()
+                    .requestMatchers(
+                        "/api/auth/**",
+                        "/api/public/**",
+                        "/api/docs/**",
+                        "/api/swagger-ui/**",
+                        "/api/swagger-ui.html"
+                    ).permitAll()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter::class.java)
@@ -45,7 +51,13 @@ class SecurityConfig {
             .securityContext { it.requireExplicitSave(false) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/api/session/**", "/api/public/**").permitAll()
+                    .requestMatchers(
+                        "/api/session/**",
+                        "/api/public/**",
+                        "/api/docs/**",
+                        "/api/swagger-ui/**",
+                        "/api/swagger-ui.html"
+                    ).permitAll()
                     .anyRequest().authenticated()
             }
             .formLogin { it.disable() }
