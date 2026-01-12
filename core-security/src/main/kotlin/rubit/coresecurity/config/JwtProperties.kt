@@ -7,5 +7,14 @@ data class JwtProperties(
     val secretKey: String,
     val accessTokenExpiration: Long = 3600000, // 1 hour in milliseconds
     val refreshTokenExpiration: Long = 604800000, // 7 days in milliseconds
-    val issuer: String = "core-security"
+    val issuer: String = "core-security",
+    val audience: String? = null,
+    val clockSkewSeconds: Long = 0,
+    val secretKeyFormat: JwtKeyFormat = JwtKeyFormat.RAW
 )
+
+enum class JwtKeyFormat {
+    RAW,
+    BASE64,
+    HEX
+}

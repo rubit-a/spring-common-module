@@ -169,6 +169,9 @@ jwt:
   access-token-expiration: 3600000
   refresh-token-expiration: 604800000
   issuer: your-app-name
+  audience: your-audience
+  clock-skew-seconds: 0
+  secret-key-format: RAW
 ```
 
 ### 3. JwtTokenProvider 사용

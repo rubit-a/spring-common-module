@@ -7,7 +7,9 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
+import rubit.coresecurity.config.JwtKeyFormat
 import rubit.coresecurity.config.JwtProperties
+import java.util.Base64
 import java.util.concurrent.TimeUnit
 
 @DisplayName("JwtTokenProvider 테스트")
@@ -189,6 +191,57 @@ class JwtTokenProviderTest {
     }
 
     @Test
+    @DisplayName("issuer가 다른 토큰은 검증을 실패한다")
+    fun validateTokenWithDifferentIssuer() {
+        // given
+        val token = jwtTokenProvider.generateAccessToken("testuser", listOf("ROLE_USER"))
+
+        val differentIssuerProperties = JwtProperties(
+            secretKey = jwtProperties.secretKey,
+            accessTokenExpiration = jwtProperties.accessTokenExpiration,
+            refreshTokenExpiration = jwtProperties.refreshTokenExpiration,
+            issuer = "different-issuer"
+        )
+        val differentIssuerProvider = JwtTokenProvider(differentIssuerProperties)
+
+        // when
+        val isValid = differentIssuerProvider.validateToken(token)
+
+        // then
+        assertFalse(isValid)
+    }
+
+    @Test
+    @DisplayName("audience가 다른 토큰은 검증을 실패한다")
+    fun validateTokenWithDifferentAudience() {
+        // given
+        val audienceProperties = JwtProperties(
+            secretKey = jwtProperties.secretKey,
+            accessTokenExpiration = jwtProperties.accessTokenExpiration,
+            refreshTokenExpiration = jwtProperties.refreshTokenExpiration,
+            issuer = jwtProperties.issuer,
+            audience = "api-audience"
+        )
+        val audienceProvider = JwtTokenProvider(audienceProperties)
+        val token = audienceProvider.generateAccessToken("testuser", listOf("ROLE_USER"))
+
+        val differentAudienceProperties = JwtProperties(
+            secretKey = jwtProperties.secretKey,
+            accessTokenExpiration = jwtProperties.accessTokenExpiration,
+            refreshTokenExpiration = jwtProperties.refreshTokenExpiration,
+            issuer = jwtProperties.issuer,
+            audience = "different-audience"
+        )
+        val differentAudienceProvider = JwtTokenProvider(differentAudienceProperties)
+
+        // when
+        val isValid = differentAudienceProvider.validateToken(token)
+
+        // then
+        assertFalse(isValid)
+    }
+
+    @Test
     @DisplayName("빈 토큰은 검증을 실패한다")
     fun validateEmptyToken() {
         // when
@@ -196,6 +249,63 @@ class JwtTokenProviderTest {
 
         // then
         assertFalse(isValid)
+    }
+
+    @Test
+    @DisplayName("clock skew 범위 내 만료된 토큰은 검증을 통과한다")
+    fun validateTokenWithinClockSkew() {
+        // given
+        val skewedProperties = JwtProperties(
+            secretKey = jwtProperties.secretKey,
+            accessTokenExpiration = 1,
+            refreshTokenExpiration = jwtProperties.refreshTokenExpiration,
+            issuer = jwtProperties.issuer,
+            clockSkewSeconds = 5
+        )
+        val skewedProvider = JwtTokenProvider(skewedProperties)
+        val token = skewedProvider.generateAccessToken("testuser", listOf("ROLE_USER"))
+
+        // when
+        TimeUnit.MILLISECONDS.sleep(10)
+        val isValid = skewedProvider.validateToken(token)
+
+        // then
+        assertTrue(isValid)
+    }
+
+    @Test
+    @DisplayName("BASE64 형식의 비밀키로 토큰을 생성할 수 있다")
+    fun generateTokenWithBase64SecretKey() {
+        // given
+        val rawKey = ByteArray(32) { it.toByte() }
+        val base64Key = Base64.getEncoder().encodeToString(rawKey)
+        val base64Properties = JwtProperties(
+            secretKey = base64Key,
+            issuer = jwtProperties.issuer,
+            secretKeyFormat = JwtKeyFormat.BASE64
+        )
+        val base64Provider = JwtTokenProvider(base64Properties)
+
+        // when
+        val token = base64Provider.generateAccessToken("testuser", listOf("ROLE_USER"))
+
+        // then
+        assertTrue(base64Provider.validateToken(token))
+    }
+
+    @Test
+    @DisplayName("잘못된 HEX 비밀키는 예외를 발생시킨다")
+    fun invalidHexSecretKeyThrows() {
+        // given
+        val invalidHexProperties = JwtProperties(
+            secretKey = "not-hex-key",
+            secretKeyFormat = JwtKeyFormat.HEX
+        )
+
+        // when & then
+        assertThrows<IllegalArgumentException> {
+            JwtTokenProvider(invalidHexProperties)
+        }
     }
 
     @Test

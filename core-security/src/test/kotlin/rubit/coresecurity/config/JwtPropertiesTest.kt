@@ -15,7 +15,10 @@ class JwtPropertiesTest {
             secretKey = "test-secret-key-for-jwt-must-be-at-least-256-bits-long-for-hmac-sha256",
             accessTokenExpiration = 7200000,
             refreshTokenExpiration = 1209600000,
-            issuer = "custom-issuer"
+            issuer = "custom-issuer",
+            audience = "api",
+            clockSkewSeconds = 30,
+            secretKeyFormat = JwtKeyFormat.BASE64
         )
 
         // then
@@ -24,6 +27,9 @@ class JwtPropertiesTest {
         assertEquals(7200000, jwtProperties.accessTokenExpiration)
         assertEquals(1209600000, jwtProperties.refreshTokenExpiration)
         assertEquals("custom-issuer", jwtProperties.issuer)
+        assertEquals("api", jwtProperties.audience)
+        assertEquals(30, jwtProperties.clockSkewSeconds)
+        assertEquals(JwtKeyFormat.BASE64, jwtProperties.secretKeyFormat)
     }
 
     @Test
@@ -40,6 +46,9 @@ class JwtPropertiesTest {
         assertEquals(3600000, jwtProperties.accessTokenExpiration) // 기본값 1시간
         assertEquals(604800000, jwtProperties.refreshTokenExpiration) // 기본값 7일
         assertEquals("core-security", jwtProperties.issuer) // 기본값
+        assertNull(jwtProperties.audience)
+        assertEquals(0, jwtProperties.clockSkewSeconds)
+        assertEquals(JwtKeyFormat.RAW, jwtProperties.secretKeyFormat)
     }
 
     @Test
@@ -50,7 +59,10 @@ class JwtPropertiesTest {
             secretKey = "my-secret-key-must-be-at-least-256-bits-long-for-hmac-sha256-algorithm",
             accessTokenExpiration = 1800000, // 30분
             refreshTokenExpiration = 2592000000, // 30일
-            issuer = "my-app"
+            issuer = "my-app",
+            audience = "mobile",
+            clockSkewSeconds = 120,
+            secretKeyFormat = JwtKeyFormat.HEX
         )
 
         // then
@@ -58,5 +70,8 @@ class JwtPropertiesTest {
         assertEquals(1800000, jwtProperties.accessTokenExpiration)
         assertEquals(2592000000, jwtProperties.refreshTokenExpiration)
         assertEquals("my-app", jwtProperties.issuer)
+        assertEquals("mobile", jwtProperties.audience)
+        assertEquals(120, jwtProperties.clockSkewSeconds)
+        assertEquals(JwtKeyFormat.HEX, jwtProperties.secretKeyFormat)
     }
 }

@@ -43,6 +43,9 @@ jwt:
   access-token-expiration: 3600000  # 1시간 (밀리초)
   refresh-token-expiration: 604800000  # 7일 (밀리초)
   issuer: your-app-name
+  audience: your-audience
+  clock-skew-seconds: 0
+  secret-key-format: RAW # RAW | BASE64 | HEX
 ```
 
 또는 `application.properties`:
@@ -55,9 +58,13 @@ jwt.secret-key=your-secret-key-here-minimum-256-bits-long
 jwt.access-token-expiration=3600000
 jwt.refresh-token-expiration=604800000
 jwt.issuer=your-app-name
+jwt.audience=your-audience
+jwt.clock-skew-seconds=0
+jwt.secret-key-format=RAW
 ```
 
 **중요**: `secret-key`는 최소 256비트(32자) 이상이어야 합니다.
+`secret-key-format=BASE64/HEX`일 때는 디코딩된 바이트 길이가 최소 32바이트 이상이어야 합니다.
 
 #### Session 모드
 
