@@ -35,6 +35,7 @@ val refreshSnapshots = (providers.gradleProperty("refreshSnapshots").orNull ?: "
 val localModuleSubstitutions = mapOf(
     "rubit:core-security" to ":core-security",
     "rubit:core-security-oauth2" to ":core-security-oauth2",
+    "rubit:core-docs" to ":core-docs",
     "rubit:core-web" to ":core-web",
     "rubit:core-logging" to ":core-logging",
     "rubit:core-data" to ":core-data",
