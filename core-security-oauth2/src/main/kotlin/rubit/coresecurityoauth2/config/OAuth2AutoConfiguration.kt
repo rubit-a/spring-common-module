@@ -49,14 +49,14 @@ class OAuth2AutoConfiguration {
         jwtProperties: JwtProperties,
         oauth2Properties: OAuth2Properties,
         authorizationRequestRepository: HttpCookieOAuth2AuthorizationRequestRepository,
-        objectMapper: ObjectMapper
+        objectMapperProvider: ObjectProvider<ObjectMapper>
     ): AuthenticationSuccessHandler {
         return OAuth2JwtSuccessHandler(
             jwtTokenProvider,
             jwtProperties,
             oauth2Properties,
             authorizationRequestRepository,
-            objectMapper
+            resolveObjectMapper(objectMapperProvider)
         )
     }
 
@@ -64,9 +64,12 @@ class OAuth2AutoConfiguration {
     @ConditionalOnMissingBean
     fun oauth2JwtFailureHandler(
         authorizationRequestRepository: HttpCookieOAuth2AuthorizationRequestRepository,
-        objectMapper: ObjectMapper
+        objectMapperProvider: ObjectProvider<ObjectMapper>
     ): AuthenticationFailureHandler {
-        return OAuth2JwtFailureHandler(authorizationRequestRepository, objectMapper)
+        return OAuth2JwtFailureHandler(
+            authorizationRequestRepository,
+            resolveObjectMapper(objectMapperProvider)
+        )
     }
 
     @Bean
@@ -103,5 +106,13 @@ class OAuth2AutoConfiguration {
         }
 
         return configured.build()
+    }
+
+    private val fallbackObjectMapper: ObjectMapper by lazy {
+        ObjectMapper().findAndRegisterModules()
+    }
+
+    private fun resolveObjectMapper(objectMapperProvider: ObjectProvider<ObjectMapper>): ObjectMapper {
+        return objectMapperProvider.ifAvailable ?: fallbackObjectMapper
     }
 }
