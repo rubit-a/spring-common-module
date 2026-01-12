@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up JDK
         uses: actions/setup-java@v4
@@ -27,4 +29,70 @@ jobs:
       - name: Publish
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew publish
+        run: |
+          set -euo pipefail
+
+          base_sha="${{ github.event.before }}"
+          if [ -z "$base_sha" ] || [ "$base_sha" = "0000000000000000000000000000000000000000" ]; then
+            base_sha="$(git rev-parse HEAD^)"
+          fi
+          if ! git cat-file -e "$base_sha" 2>/dev/null; then
+            base_sha="$(git rev-list --max-parents=0 HEAD)"
+          fi
+
+          changed_files="$(git diff --name-only "$base_sha" "${{ github.sha }}")"
+
+          declare -A module_paths=(
+            [core-security]="core-security/"
+            [core-security-oauth2]="core-security-oauth2/"
+            [core-docs]="core-docs/"
+            [core-web]="core-web/"
+            [core-logging]="core-logging/"
+            [core-data]="core-data/"
+            [core-excel]="core-excel/"
+          )
+
+          declare -A module_keys=(
+            [coreSecurityVersion]="core-security"
+            [coreSecurityOauth2Version]="core-security-oauth2"
+            [coreDocsVersion]="core-docs"
+            [coreWebVersion]="core-web"
+            [coreLoggingVersion]="core-logging"
+            [coreDataVersion]="core-data"
+            [coreExcelVersion]="core-excel"
+          )
+
+          declare -A modules=()
+
+          for module in "${!module_paths[@]}"; do
+            if echo "$changed_files" | grep -q "^${module_paths[$module]}"; then
+              modules["$module"]=1
+            fi
+          done
+
+          if echo "$changed_files" | grep -q "^gradle.properties$"; then
+            changed_keys="$(git diff "$base_sha" "${{ github.sha }}" -- gradle.properties | \
+              grep -E '^[+-]core[A-Za-z]+Version=' | sed -E 's/^[+-]([^=]+)=.*/\\1/' | sort -u)"
+            for key in $changed_keys; do
+              if [ "$key" = "coreCommonVersion" ]; then
+                for module in "${!module_paths[@]}"; do
+                  modules["$module"]=1
+                done
+              elif [ -n "${module_keys[$key]:-}" ]; then
+                modules["${module_keys[$key]}"]=1
+              fi
+            done
+          fi
+
+          if [ ${#modules[@]} -eq 0 ]; then
+            echo "No modules to publish."
+            exit 0
+          fi
+
+          tasks=()
+          for module in "${!modules[@]}"; do
+            tasks+=(":$module:publish")
+          done
+
+          echo "Publishing: ${tasks[*]}"
+          ./gradlew "${tasks[@]}"
